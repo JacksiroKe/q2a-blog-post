@@ -25,8 +25,6 @@
 					return qa_lang('qa_blog_lang/default_blog_title');
 				case 'qa_blog_tagline':
 					return qa_lang('qa_blog_lang/default_blog_tagline');
-				case 'qa_site_url':
-					return qa_lang('qa_blog_lang/default_site_url');
 				case 'qa_blog_cat_1':
 					return qa_lang('qa_blog_lang/default_cat_1');
 				case 'qa_blog_cat_2':
@@ -56,7 +54,6 @@
 				qa_opt('qa_blog_enabled', (bool)qa_post_text('qa_blog_enabled'));
 				qa_opt('qa_blog_title', qa_post_text('qa_blog_title'));
 				qa_opt('qa_blog_tagline', qa_post_text('qa_blog_tagline'));	
-				qa_opt('qa_site_url', qa_post_text('qa_site_url'));
 				qa_opt('qa_blog_cat_1', qa_post_text('qa_blog_cat_1'));
 				qa_opt('qa_blog_cat_2', qa_post_text('qa_blog_cat_2'));
 				qa_opt('qa_blog_cat_3', qa_post_text('qa_blog_cat_3'));
@@ -70,7 +67,6 @@
 			qa_set_display_rules($qa_content, array(
 				'field_2' => 'field_1',
 				'field_3' => 'field_1',
-				'field_4' => 'field_1',
 				'field_5' => 'field_1',
 				'field_6' => 'field_1',
 				'field_7' => 'field_1',
@@ -107,13 +103,6 @@
 				'tags' => 'name="qa_blog_tagline"',				
 			);
 			
-			$fields[] = array(
-				'id' => 'field_4',
-				'type' => 'input',
-				'label' => qa_lang('qa_blog_lang/site_url'),
-				'value' => qa_opt('qa_site_url'),
-				'tags' => 'name="qa_site_url"',
-			);
 						
 			$fields[] = array(
 				'id' => 'field_5',
@@ -171,9 +160,7 @@
 				'type' => 'number',
 				'value' => (int)qa_opt('qa_blog_content_max'),
 				'tags' => 'name="qa_blog_content_max_field"',
-				'error' => 'If this plugin works well on your site, please
-				<a href="http://tujuane.net/websmata/qtoa/plugins/blog-post" target="_blank">comment on my website</a> with the link to your site.',
-			);
+				);
 			
 			return array(           
 				'ok' => ($ok && !isset($error)) ? $ok : null,
