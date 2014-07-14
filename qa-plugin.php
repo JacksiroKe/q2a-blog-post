@@ -31,7 +31,7 @@ if ( !defined('QA_VERSION') )
 	qa_register_plugin_module('page', 'qa-articles.php', 'qa_articles', 'blog');
 	
 	// edit article page
-	//qa_register_plugin_module('page', 'qa-blog-update.php', 'qa-blog-update', 'blog update');
+	qa_register_plugin_module('page', 'qa-edit.php', 'qa_edit', 'blog edit');
 	
 	// users layer
 	qa_register_plugin_layer('qa-users-layer.php', 'Blog Post layer');
