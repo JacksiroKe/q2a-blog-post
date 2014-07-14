@@ -95,8 +95,46 @@ class qa_articles
 		$qa_content=qa_content_prepare();
 		
 		$errors = array();
-		
-		if (qa_clicked('doarticle')) { 
+		if (qa_clicked('docancel'))	qa_redirect('blog');
+		else if (qa_clicked('dosaveoptions')) {
+				
+				$in=array();
+			qa_get_post_content('editor', 'content', $in['editor'], $in['content'], $in['format'], $in['text']);
+			$in['title']=qa_post_text('title');
+						$in['category']=qa_post_text('category');
+			if (strlen($in['title']) < 10 || strlen($in['content']) < 50 ||
+					($in['category'] !== 'cat_0' && 
+					$in['category'] !== 'cat_1' && 
+					$in['category'] !== 'cat_2' &&
+					$in['category'] !== 'cat_3' && 
+					$in['category'] !== 'cat_4' && 
+					$in['category'] !== 'cat_5')) 
+					
+			{
+				if (strlen($in['title']) < 10) $errors['title'] = qa_lang('qa_blog_lang/error_title');
+				if (strlen($in['content']) < 50) $errors['content'] = qa_lang('qa_blog_lang/error_content');
+				if ($in['category'] !== 'cat_0' && 
+					$in['category'] !== 'cat_1' && 
+					$in['category'] !== 'cat_2' &&
+					$in['category'] !== 'cat_3' && 
+					$in['category'] !== 'cat_4' && 
+					$in['category'] !== 'cat_5')
+					$errors['type'] = 'Invalid category';
+			} 
+			else {
+				$type = 0;
+				if ($in['category'] === 'cat_1') $type = 1;
+				else if ($in['category'] === 'cat_2') $type = 2;
+				else if ($in['category'] === 'cat_3') $type = 3;
+				else if ($in['category'] === 'cat_4') $type = 4;
+				else if ($in['category'] === 'cat_5') $type = 5;
+
+				qa_db_query_sub('INSERT INTO ^blog_posts (postid, userid, posted, title, type, content, views,format) 
+				VALUES (0,#,NOW(),$,#,$,0,$)',qa_get_logged_in_userid(),$in['title'],$type,$in['content'],'draft');
+				header('location:'.qa_path_to_root().'/user/'.qa_get_logged_in_handle().'');
+			}
+			}
+		else if (qa_clicked('doarticle')) { 
 			
 			$in=array();
 			qa_get_post_content('editor', 'content', $in['editor'], $in['content'], $in['format'], $in['text']);
@@ -106,7 +144,9 @@ class qa_articles
 					($in['category'] !== 'cat_0' && 
 					$in['category'] !== 'cat_1' && 
 					$in['category'] !== 'cat_2' &&
-					$in['category'] !== 'cat_3' )) 
+					$in['category'] !== 'cat_3' && 
+					$in['category'] !== 'cat_4' && 
+					$in['category'] !== 'cat_5')) 
 					
 			{
 				if (strlen($in['title']) < 10) $errors['title'] = qa_lang('qa_blog_lang/error_title');
@@ -114,7 +154,9 @@ class qa_articles
 				if ($in['category'] !== 'cat_0' && 
 					$in['category'] !== 'cat_1' && 
 					$in['category'] !== 'cat_2' &&
-					$in['category'] !== 'cat_3')
+					$in['category'] !== 'cat_3' && 
+					$in['category'] !== 'cat_4' && 
+					$in['category'] !== 'cat_5')
 					$errors['type'] = 'Invalid category';
 			} 
 			else {
@@ -122,10 +164,12 @@ class qa_articles
 				if ($in['category'] === 'cat_1') $type = 1;
 				else if ($in['category'] === 'cat_2') $type = 2;
 				else if ($in['category'] === 'cat_3') $type = 3;
+				else if ($in['category'] === 'cat_4') $type = 4;
+				else if ($in['category'] === 'cat_5') $type = 5;
 
 				$result = qa_db_query_sub('INSERT INTO ^blog_posts (postid, userid, posted, title, type, content, views,format) 
-									VALUES (0,#,NOW(),$,#,$,0,$)',qa_get_logged_in_userid(),$in['title'],$type,$in['content'],'markdown');
-			header('location:'.qa_path_to_root().'/user/'.qa_get_logged_in_handle().'/articles');
+				VALUES (0,#,NOW(),$,#,$,0,$)',qa_get_logged_in_userid(),$in['title'],$type,$in['content'],'markdown');
+			header('location:'.qa_path_to_root().'/blog/');
 			}
 		
 		}
@@ -147,11 +191,13 @@ class qa_articles
 
 			$typeoptions = array('cat_1' => $category_1,
 								 'cat_2' => $category_2,
-							     'cat_3' => $category_3);
+							     'cat_3' => $category_3,
+							     'cat_4' => $category_4,
+						         'cat_5' => $category_5);
 					
 		
 			$qa_content['form']=array(
-				'tags' => 'name="ask" method="post" action="'.qa_self_html().'"',
+				'tags' => 'name="blog" method="post" action="'.qa_self_html().'"',
 								
 				'style' => 'tall',
 								
@@ -182,10 +228,20 @@ class qa_articles
 				),
 				
 				'buttons' => array(
-					'ask' => array(
+					'post' => array(
 						'tags' => 'onclick="qa_show_waiting_after(this, false); '.
 							(method_exists($editor, 'update_script') ? $editor->update_script('content') : '').'"',
 						'label' => qa_lang('qa_blog_lang/post_button'),
+					),
+					
+				'save' => array(
+				'tags' => 'name="dosaveoptions"',
+				'label' => qa_lang('qa_blog_lang/draft_button'),
+				),
+				
+				'cancel' => array(
+						'tags' => 'name="docancel"',
+						'label' => qa_lang('qa_blog_lang/cancel_button'),
 					),
 				),
 				
@@ -214,6 +270,7 @@ class qa_articles
 		}
 	else
 	{
+		$qa_content['title']= qa_lang('qa_blog_lang/title_error');
 		$qa_content['error'] = qa_insert_login_links( qa_lang('qa_blog_lang/access_error'),$request );
 	}			
 		return $qa_content;
