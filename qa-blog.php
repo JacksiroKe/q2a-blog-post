@@ -57,28 +57,34 @@ class qa_blog
 		$category_3 = qa_opt('qa_blog_cat_3');
 		$category_4 = qa_opt('qa_blog_cat_4');
 		$category_5 = qa_opt('qa_blog_cat_5');
-		// regular page request
+		
 		$qa_content=qa_content_prepare();
-		$site_url = qa_opt('qa_site_url');
-			$cat = -1;
+		$cat = -1;
 		if (isset($_GET['category'])) $cat = $_GET['category'];
 			$qa_content['navigation']['sub'] = array();
 		$qa_content['navigation']['sub']['all'] = array(	'label' => qa_lang('qa_blog_lang/nav_all'),
-				'url' => $site_url.'/blog',
+				'url' => qa_path_to_root().'/blog',
 				'selected' => isset($_GET['category']) ? 0 : 1);
 		$qa_content['navigation']['sub']['cat1'] = array('label' => $category_1,
-				'url' => $site_url.'/blog?category=1',
+				'url' => qa_path_to_root().'/blog?category=1',
 				'selected' => $cat == 1 ? 1 : 0);			
 		$qa_content['navigation']['sub']['cat2'] = array('label' => $category_2,
-				'url' => $site_url.'/blog?category=2',
+				'url' => qa_path_to_root().'/blog?category=2',
 				'selected' => $cat == 2 ? 1 : 0);
 		$qa_content['navigation']['sub']['cat3'] = array('label' => $category_3,
-				'url' => $site_url.'/blog?category=3',
+				'url' => qa_path_to_root().'/blog?category=3',
 				'selected' => $cat == 3 ? 1 : 0);
+		$qa_content['navigation']['sub']['cat4'] = array('label' => $category_4,
+				'url' => qa_path_to_root().'/blog?category=4',
+				'selected' => $cat == 4 ? 1 : 0);
+		$qa_content['navigation']['sub']['cat5'] = array('label' => $category_5,
+				'url' => qa_path_to_root().'/blog?category=5',
+				'selected' => $cat == 5 ? 1 : 0);
 		$qa_content['navigation']['sub']['post'] = array('label' => qa_lang('qa_blog_lang/nav_post'),
-				'url' => $site_url.'/articles');	
+				'url' => qa_path_to_root().'/articles');	
 
 	$qa_content['title']= qa_opt('qa_blog_title');	
+	
 	
 	$postid = qa_request_part(1);
 	if (isset($postid)) {
@@ -89,9 +95,11 @@ class qa_blog
 			$qa_content['custom']= "";
 			$html = qa_viewer_html($row['content'],$row['format'],array('showurllinks' => 1));
 			$strviews = qa_lang('qa_blog_lang/post_views');
+			$views = $row['views'];
 			if ($row['views'] == 1) $strviews = qa_lang('qa_blog_lang/post_views');
 			$author =  handleLinkForID($row['userid']); 
 			if ($row['userid'] == 0) $author = qa_lang('qa_blog_lang/userid_null');
+			$user = $row['userid'];
 			$date = $row['posted'];
 			$date =new DateTime($date);
 			$on = $date->format('Y.m.d');
@@ -100,19 +108,55 @@ class qa_blog
 			$result = qa_db_query_sub("SELECT COUNT(*) as total FROM ^blog_comments WHERE `parentid` LIKE #", $parentid);
 			$countdata = mysql_fetch_assoc($result);
 			$count = $countdata['total'];
-			
+			$delete = "<a href='".qa_path_to_root()."/edit/".$postid."'/>
+			<img src='".qa_opt('qa_site_url')."/qa-plugin/blog-post/images/delete.png'> Delete </a>";
+			$edit = "<a href='".qa_path_to_root()."/edit/".$postid."'/>
+			<img src='".qa_opt('qa_site_url')."/qa-plugin/blog-post/images/edit.png'> Edit </a>";
+			$flag = "<a href='#'/>
+			<img src='".qa_opt('qa_site_url')."/qa-plugin/blog-post/images/edit.png'> Flag </a>";
+			$comments = qa_lang('qa_blog_lang/post_comments');
+			$queryName = qa_db_read_one_assoc( qa_db_query_sub('SELECT content
+											FROM `^userprofile`
+											WHERE `userid`='.$user.'
+											AND title="name"
+											LIMIT 0,#;', $user), true );
+			$name = (isset($queryName['content']) && trim($queryName['content'])!='') ? $queryName['content'] : $author;
+			$result = qa_db_query_sub('SELECT * FROM ^users WHERE userid=#',$user);
+				if ($row = mysql_fetch_array($result)) {
+				$fullname = '<a href="/user/'.$row['handle'].'">'.$name.'</a>';	
+				}
+			if(qa_is_logged_in())
+				{
 			$html .= "<hr>
 					<span style='float:left;padding-left:10px'>
-					".qa_lang('qa_blog_lang/posted_on')." ".$author. " ".qa_lang('qa_blog_lang/on')."
+					".qa_lang('qa_blog_lang/posted_by')." ".$fullname. " ".qa_lang('qa_blog_lang/on')."
 					".$on." ".qa_lang('qa_blog_lang/at')." ".$at."</span>
 					<span style='float:right;padding-right:10px;'>
-					 ".$row['views']." ".$strviews."</span>
+					".$edit." . ".$delete." |
+					<img src='".qa_path_to_root()."/qa-plugin/blog-post/images/comment.png'>".$count." ".$comments."
+					<img src='".qa_path_to_root()."/qa-plugin/blog-post/images/hits.jpg'>".$views." ".$strviews."</span>
 					<br>";
-					
-			$countdata = mysql_fetch_assoc($result);
-			$count = $countdata['total'];
+					}
+			else 
+					$html .= "<hr>
+					<span style='float:left;padding-left:10px'>
+					".qa_lang('qa_blog_lang/posted_by')." ".$fullname. " ".qa_lang('qa_blog_lang/on')."
+					".$on." ".qa_lang('qa_blog_lang/at')." ".$at."</span>
+					<span style='float:right;padding-right:10px;'>".$count." ".$comments." | ".$row['views']." ".$strviews."</span>
+					<br>";
+			
+			 $html .= "<h2>Comments features is not available in free version</h2>";
+			$parentid = qa_request_part(1);
+			$result = qa_db_query_sub("SELECT * FROM ^blog_comments WHERE parentid =  '$parentid' ");	
+			$i=0;
+			while ($blob = mysql_fetch_array($result)) {
+			$i++;
+			$html .= "<p> ".$blob['comment']."</span><br>".qa_lang('qa_blog_lang/comment')."
+					".$author." ".qa_lang('qa_blog_lang/on')." ".$on." ".qa_lang('qa_blog_lang/at')."
+					".$at."</p>";}
+			if ($i==0) $html .= '<h3>No Comments yet</h3>';
 		}
-		else $html .= qa_lang('qa_blog_lang/post_null');
+		else $html = qa_lang('qa_blog_lang/post_null');
 	}
 	else {
 		$cat = -1;
@@ -130,25 +174,34 @@ class qa_blog
 		$qa_content['navigation']['sub']['cat3'] = array('label' => $category_3,
 				'url' => './blog?category=3',
 				'selected' => $cat == 3 ? 1 : 0);
+		$qa_content['navigation']['sub']['cat4'] = array('label' => $category_4,
+				'url' => './blog?category=4',
+				'selected' => $cat == 4 ? 1 : 0);
+		$qa_content['navigation']['sub']['cat5'] = array('label' => $category_5,
+				'url' => './blog?category=5',
+				'selected' => $cat == 5 ? 1 : 0);
 		$qa_content['navigation']['sub']['post'] = array('label' => qa_lang('qa_blog_lang/nav_post'),
 				'url' => './articles');
 		
 		
 		$html = qa_opt('qa_blog_tagline').'<hr>';
 		$page = 1;
-		if (isset($_GET['page'])) $page = $_GET['page'];
+	if (isset($_GET['page'])) $page = $_GET['page'];
 		$limit = 10;
-		if (isset($_GET['category'])) $result = qa_db_query_sub("SELECT * FROM ^blog_posts WHERE type=# ORDER BY posted DESC LIMIT #,#",$cat,($page-1)*$limit,$limit);
-		else $result = qa_db_query_sub("SELECT * FROM ^blog_posts ORDER BY posted DESC LIMIT #,#",($page-1)*$limit,$limit);
+	if (isset($_GET['category'])) 
+		$result = qa_db_query_sub("SELECT * FROM ^blog_posts WHERE type=# WHERE format='markdown'
+		ORDER BY posted DESC LIMIT #,#",$cat,($page-1)*$limit,$limit);
+	else 
+		$result = qa_db_query_sub("SELECT * FROM ^blog_posts  WHERE format='markdown' ORDER BY posted DESC LIMIT #,#",($page-1)*$limit,$limit);
 		$i=0;
-		$site_url = qa_opt('qa_site_url');
 		while ($article = mysql_fetch_array($result)) {
 			$i++;
 			$author = $article['userid'];
 			if ($article['userid'] == 0) $author = qa_lang('qa_blog_lang/userid_null');
 			$html .= article_item_with_author($article['title'],
-			''.$site_url.'/blog/'.$article['postid'].'/'.seoUrl($article['title']).'/',
-			$author,$article['posted'],$article['views'],$article['type']);
+			''.qa_path_to_root().'/blog/'.$article['postid'].'/'.seoUrl($article['title']).'/',
+			$article['content'],$author,$article['posted'],$article['views'],
+			$article['type'],$article['postid']);
 			
 		}
 			
@@ -188,43 +241,91 @@ class qa_blog
 }
 
 function seoUrl($string) {
-	    //Unwanted:  {UPPERCASE} ; / ? : @ & = + $ , . ! ~ * ' ( )
 	    $string = strtolower($string);
-	    //Strip any unwanted characters
-	    $string = preg_replace("/[^a-z0-9_\s-]/", "", $string);
-	    //Clean multiple dashes or whitespaces
-	    $string = preg_replace("/[\s-]+/", " ", $string);
-	    //Convert whitespaces and underscore to dash
+		$string = preg_replace("/[^a-z0-9_\s-]/", "", $string);
+		$string = preg_replace("/[\s-]+/", " ", $string);
 	    $string = preg_replace("/[\s_]/", "-", $string);
 	    return $string;
 }
 
-function article_item_with_author($title,$link,$author,$date,$views,$type) {
+function article_item_with_author($title,$link,$content,$author,$date,$views,$type,$postid) {
 	
 	$category_1 = qa_opt('qa_blog_cat_1');
 	$category_2 = qa_opt('qa_blog_cat_2');
 	$category_3 = qa_opt('qa_blog_cat_3');
-		
-	if ($author !== '') $author =  'by '.handleLinkForID($author);
+	$category_4 = qa_opt('qa_blog_cat_4');
+	$category_5 = qa_opt('qa_blog_cat_5');
+	$editor =qa_get_logged_in_userid();
+	$level=qa_get_logged_in_level();
+	
+	if($level>=QA_USER_LEVEL_MODERATOR) {
+	$edit = '<a href="'.qa_opt('qa_site_url').'/edit/'.$postid.'"/>
+	<img src="'.qa_opt('qa_site_url').'/qa-plugin/blog-post/images/edit.png"> Edit</a>';
+	}
+	else $edit = '';
+	$user = $author;
+	$max = qa_opt('qa_blog_content_max');
+	$cut = strip_tags($content);
+	$body = substr($cut,0,$max);
+	$more = ' . . . <strong><a href="'.$link.'">Read more</a></strong>'; 
+	$parentid = $postid;
+	$result = qa_db_query_sub("SELECT COUNT(*) as total FROM ^blog_comments WHERE `parentid` LIKE #", $parentid);
+	$countdata = mysql_fetch_assoc($result);
+	$count = $countdata['total'];
+	$comments = qa_lang('qa_blog_lang/post_comments');
+	$cl = $count.$comments;
+	if ($author !== '') $author = handleLinkForID($author);
 	$vl = $views.qa_lang('qa_blog_lang/post_views');
 	if ($views == 1) $vl = $views.qa_lang('qa_blog_lang/post_views');
 	$date =new DateTime($date);
-	$on = $date->format('Y.m.d');
+	$on = $date->format('d M, Y');
 	$at = $date->format('H:i');
-	
-	$category = $category_1;
+	$category = $category_1;	
 	if ($type == 2) $category = $category_2;
 	else if ($type == 3) $category = $category_3;
-	$category = '<a href="./blog?category='.$type.'">'.$category.'</a>';
-	return '<div><h2><a href="'.$link.'">'.$title.'</a></div></h2>
-			<pre>Posted on <u>'.$on.'</u> '.$author.' in '.$category.' ('.$vl.')</pre><br>';
+	else if ($type == 4) $category = $category_4;
+	else if ($type == 5) $category = $category_5;
+	$category = '<a href="./blog?category='.$type.'">'.$category.'</a>';	
+	$queryName = qa_db_read_one_assoc( qa_db_query_sub('SELECT content
+											FROM `^userprofile`
+											WHERE `userid`='.$user.'
+											AND title="name"
+											LIMIT 0,#;', $user), true );
+	$name = (isset($queryName['content']) && trim($queryName['content'])!='') ? $queryName['content'] : $author;
+	$result = qa_db_query_sub('SELECT * FROM ^users WHERE userid=#',$user);
+	if ($row = mysql_fetch_array($result)) {
+		$fullname = '<a href="/user/'.$row['handle'].'">'.$name.'</a>';		
+		$pic = '<a href="user/'.$row['handle'].'">
+					<img style="border-radius:20px;" src="?qa=image&qa_blobid='.$row['avatarblobid'].'&qa_size=100"/></a>';
+		$nopic = '<a href="user/'.$row['handle'].'">
+			<img style="border-radius:20px;" src="?qa=image&qa_blobid='.qa_opt('avatar_default_blobid').'&qa_size=100"/></a>';
+		$avatar = (isset($row['avatarblobid']) && trim($pic)!='') ? $pic : $nopic;
+		}
+	
+	return '<div>
+				<h2><a href="'.$link.'">'.$title.'</a></h2>
+					</table><table width="700">
+					<tr><td  width="150">
+					<p><center>'.$avatar.'<br><strong>'.$fullname.' </strong></center></p>
+					</td><td valign="top">
+						<p>'.$body.$more.'</p>
+					<table>
+					<tr><td></td><td>
+						Posted in '.$category.' '.$on.' | 
+						<img src="'.qa_opt('qa_site_url').'/qa-plugin/blog-post/images/comment.png"> '.$cl.'
+						<img src="'.qa_opt('qa_site_url').'/qa-plugin/blog-post/images/hits.jpg"> '.$vl.' 						
+						'.$edit.'
+						</td></tr></table></td></tr>
+				</table><br>
+			</div>';
 	
 		
 }
+
 function handleLinkForID($id) {
 	$result = qa_db_query_sub('SELECT * FROM ^users WHERE userid=#',$id);
 	if ($row = mysql_fetch_array($result)) {
-		return '<a href="/user/'.$row['handle'].'">'.$row['handle'].'</a>';
+		return '<a href="/user/'.$row['handle'].'">@'.$row['handle'].'</a>';
 	}
 	return 'anonymous';
-}
+} ?>
