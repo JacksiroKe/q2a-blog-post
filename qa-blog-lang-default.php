@@ -24,7 +24,7 @@
 		'default_cat_5' => 'Category 5',
 		'default_blog_title' => 'QtoA Blog',
 		'default_blog_tagline' => 'These posts are made by members on this website. You can make some yourself!',
-		'default_site_url' => 'http://localhost/q2a/',
+		'default_site_url' => 'http://localhost/q2a',
 		'site_url' => 'Your QtoA url:',
 		'cat_1' => 'Category 1:',
 		'cat_2' => 'Category 2:',
@@ -46,8 +46,8 @@
 		'in_cat' => 'in',
 		'on' => 'on',
 		'at' => 'at',
-		'post_views' => ' views',
-		'post_comments' => ' comments',
+		'post_views' => ' hits,  ',
+		'post_comments' => ' comments,  ',
 		'post_null' => 'No such article!',
 		'posts_null' => 'Sorry there are currently no blog posts here yet. Get things started by being the first to post here!',
 		
@@ -57,7 +57,9 @@
 		'blog_rules' => 'Instructions on the Posting page of your Blog - HTML allowed:',
 		'post_title' => 'Title of your Article:',
 		'post_cat' => 'Category:',
-		'post_button' => 'Post an Article',
+		'post_button' => 'Publish an Article',
+		'draft_button' => 'Save as Draft',
+		'cancel_button' => 'Cancel',
 		'post_null' => 'No posts yet.',
 		'past_post' => 'Some of your past blog posts . . .',
 		'error_title' => 'Title has to be at least 10 characters.',
@@ -74,7 +76,7 @@
 		'nav_articles' => 'All Articles',
 		'new_articles' => 'New Article',
 		'title_recent' => 'Recent articles by',
-		'oops' => 'Ooops! It looks like', 
+		'oops' => 'Oops! It looks like', 
 		'no_post' => 'hasn\'t posted any articles yet',
 
 		// Comments Section
@@ -82,10 +84,20 @@
 		'comment_error' => 'Please ^1log in^2 or ^3register^4 to comment on this post!',
 		'comment' => 'Commented by',
 		
+		// Edit Page
+		'title_error' => 'Oops! This is not your article.',
+		'edit_error' => 'Sorry, Your are not the author of this article! Go back to ',
+		'edit_error1' => 'the blog homepage',
+		'edit_note' => 'Sorry! You are trying to edit somebody else\'s article. You can only edit your very own article not unless you have been assigned the duty of a moderator by
+		the administrator of this site',
+		'update_button' => 'Update article',
+		'hide_button' => 'Hide article',
+		'delete_button' => 'Delete article',
+		'cancel_button' => 'Cancel editing',
+		
 		// Latest Blog Posts Widget
 		'widget_title' => 'Latest Blog Posts',
-		'more_posts' => 'Read More Blog Posts',
-		
+		'more_posts' => 'Read More Blog Posts',		
 		
 	);
 
