@@ -9,7 +9,7 @@
 	Plugin Author URI: https://github.com/JackSiro
 	Plugin License: GPLv3
 	Plugin Minimum Question2Answer Version: 1.7
-	Plugin Update Check URI: 
+	Plugin Update Check URI: https://github.com/JackSiro/Q2A-Blog-Post-Plugin/master/qa-plugin.php
 
 */
 
