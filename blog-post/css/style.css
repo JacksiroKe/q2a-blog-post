@@ -1,0 +1,214 @@
+/*
+	Plugin Name: Blog Post
+	Plugin URI: http://tujuane.net/websmata/qtoa/plugins/12-blog-post.html
+	Plugin Description: The Blog module allows registered users to maintain an online journal, or blog. The blog entries are displayed by creation time in descending order.
+	Plugin Version: 3.0
+	Plugin Date: 2014-04-01
+	Plugin Author: Jackson Silla
+	Plugin Author URI: http://question2answer.org/qa/user/jaxila
+	Plugin License: GPLv3
+	Plugin Minimum Question2Answer Version: 1.5
+	Plugin Update Check URI: http://tujuane.net/websmata/qtoa/plugins/12-blog-post.html
+
+
+*/
+
+.bp_article_item,.slider {
+    font-size: 14px;
+	background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #CFD7E6;
+    border-radius: 5px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 12px;
+}
+.bp_article{
+	font-size: 14px;
+	background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #CFD7E6;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+    padding: 10px;
+}
+
+
+.bp_article_info{
+	padding-top:0px;
+    padding: 10px;
+	font-size: 12px;
+	background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #CFD7E6;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+.bp_author_info{
+	font-size: 14px;
+	background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #CFD7E6;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+	min-height:160px;
+	margin: 10px 0;
+}
+.bp_avatar{
+	float: left;margin: 1px;		
+}
+.bp_avatar1{
+	background: none repeat scroll 0 0 #CFD7E6;
+    border: 1px solid #CFD7E6;
+    color: #000;
+    cursor: pointer;
+    float: right;
+    height: 90px;
+    overflow: visible;
+	line-height: 1.5;
+    padding: 0;
+    position: absolute;
+    right: -1px;
+	top: -1px;
+    width: 100px;
+	-webkit-transition: 0.25s linear;
+	-moz-transition: 0.25s linear;
+	-o-transition: 0.25s linear;
+	transition: 0.25s linear;
+	-webkit-backface-visibility: hidden;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+}
+#bp_comment {
+	width: 98%;
+	float: left;
+	background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #2198DD;
+    display: inline;
+	position: relative;
+    margin-bottom: 5px;
+}
+.bp_comment_field {
+	background-color: rgba(0, 0, 0, 0);
+    padding: 7px 0;
+    width: 100%;
+	border:medium none;
+	height: 30px;
+    padding: 0 4px;
+}
+.bp_comment_button{
+	background: none repeat scroll 0 0 #3399FF;
+    border: 0 none;
+    border-radius: 0 3px 3px 0;
+    color: #FFFFFF;
+    cursor: pointer;
+    float: right;
+    font: bold 15px/40px 'lucida sans','trebuchet MS','Tahoma';
+    height: 32px;
+    overflow: visible;
+	line-height: 1.5;
+    padding: 0;
+    position: absolute;
+    right: -1px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    top: -1px;
+    width: 90px;
+	-webkit-transition: 0.25s linear;
+	-moz-transition: 0.25s linear;
+	-o-transition: 0.25s linear;
+	transition: 0.25s linear;
+	-webkit-backface-visibility: hidden;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+
+
+}
+.bp_comment_item{
+	padding:6px;
+	padding-right:0;
+}
+
+.jssort04 .w, .jssort04 .pav:hover .w
+{
+	position: absolute;
+	width: 60px;
+	height: 30px;
+	border: #0099FF 1px solid;
+}
+* html .jssort04 .w
+{
+	width: /**/ 62px;
+	height: /**/ 32px;
+}
+.jssort04 .pdn .w, .jssort04 .pav .w
+{
+	border-style: solid;
+}
+.jssort04 .c
+{
+	width: 62px;
+	height: 32px;
+	filter: alpha(opacity=45);
+	opacity: .45;
+	transition: opacity .6s;
+	-moz-transition: opacity .6s;
+	-webkit-transition: opacity .6s;
+	-o-transition: opacity .6s;
+}
+.jssort04 .p:hover .c, .jssort04 .pav .c
+{
+	filter: alpha(opacity=0);
+	opacity: 0;
+}
+.jssort04 .p:hover .c
+{
+	transition: none;
+	-moz-transition: none;
+	-webkit-transition: none;
+	-o-transition: none;
+}
+.jssora07l, .jssora07r, .jssora07ldn, .jssora07rdn
+{
+	position: absolute;
+	cursor: pointer;
+	display: block;
+	background: url(a07.png) no-repeat;
+	overflow: hidden;
+}
+.jssora07l
+{
+	background-position: -5px -35px;
+}
+.jssora07r
+{
+	background-position: -65px -35px;
+}
+.jssora07l:hover
+{
+	background-position: -125px -35px;
+}
+.jssora07r:hover
+{
+	background-position: -185px -35px;
+}
+.jssora07ldn
+{
+	background-position: -245px -35px;
+}
+.jssora07rdn
+{
+	background-position: -305px -35px;
+}
+
+
+@media (max-width: 790px){
+	.bp_actions,.bp_article,.bp_article_info,.bp_author_info{
+	float: left;
+	padding: 1%;
+	width: 98%;
+	margin: 3px 0;
+	}
+}
