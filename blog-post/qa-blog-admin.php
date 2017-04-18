@@ -1,14 +1,14 @@
 <?php
 /*
 	Plugin Name: Blog Post
-	Plugin URI: http://websmata.tujuane.net/qtoa/blog
+	Plugin URI: https://github.com/JackSiro/Q2A-Blog-Post-Plugin
 	Plugin Description: The Blog module allows registered users to maintain an online journal, or blog. The blog entries are displayed by creation time in descending order.
 	Plugin Version: 3.0
 	Plugin Date: 2014-04-01
 	Plugin Author: Jackson Siro
-	Plugin Author URI: http://question2answer.org/qa/user/jaxila
+	Plugin Author URI: https://github.com/JackSiro
 	Plugin License: GPLv3
-	Plugin Minimum Question2Answer Version: 1.5
+	Plugin Minimum Question2Answer Version: 1.7
 	Plugin Update Check URI: 
 
 */
@@ -75,7 +75,6 @@ class qa_html_theme_layer extends qa_html_theme_base {
 			$this->content['error']="";
 			$this->content['suggest_next']="";
 			$this->content['title']="Blog Post Settings";
-			$this->content['custom']='';
 					
 			$saved=false;		
 			
@@ -277,6 +276,7 @@ class qa_html_theme_layer extends qa_html_theme_base {
 				),
 			);
 			$this->content['form']=$options;
+			$this->content['custom']= '<p>If you think this plugin is great and helps you on your site please donate some $5 to $30 to my paypal account: <a href="mailto:smataweb@gmail.com">smataweb@gmail.com</a></p>';
 		}
 		
 		else if ( ($qa_request == 'admin/blogm') and (qa_get_logged_in_level()>=QA_USER_LEVEL_ADMIN) ) {
