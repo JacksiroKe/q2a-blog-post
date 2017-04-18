@@ -1,18 +1,18 @@
 <?php
 /*
 	Plugin Name: Blog Post
-	Plugin URI: http://tujuane.net/websmata/qtoa/plugins/12-blog-post.html
+	Plugin URI: https://github.com/JackSiro/Q2A-Blog-Post-Plugin
 	Plugin Description: The Blog module allows registered users to maintain an online journal, or blog. The blog entries are displayed by creation time in descending order.
 	Plugin Version: 3.0
 	Plugin Date: 2014-04-01
-	Plugin Author: Jackson Silla
-	Plugin Author URI: http://question2answer.org/qa/user/jaxila
+	Plugin Author: Jackson Siro
+	Plugin Author URI: https://github.com/JackSiro
 	Plugin License: GPLv3
-	Plugin Minimum Question2Answer Version: 1.5
-	Plugin Update Check URI: http://tujuane.net/websmata/qtoa/plugins/12-blog-post.html
-
+	Plugin Minimum Question2Answer Version: 1.7
+	Plugin Update Check URI: https://github.com/JackSiro/Q2A-Blog-Post-Plugin/master/qa-plugin.php
 
 */
+
 require_once QA_INCLUDE_DIR.'app/format.php';
 require_once QA_INCLUDE_DIR.'app/limits.php';
 require_once QA_INCLUDE_DIR.'db/selects.php';
