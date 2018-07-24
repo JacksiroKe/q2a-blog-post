@@ -1,4 +1,4 @@
-BLOG POST PLUGIN 
+Q2A BLOG POST PLUGIN 
 =============
 
 The Blog module allows registered users to maintain an online journal, or blog. Blogs are made up of individual blog entries. By default, the blog entries are displayed by creation time in descending order.
