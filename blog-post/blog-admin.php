@@ -1,7 +1,7 @@
 <?php
 /*
 	Blog Post by Jackson Siro
-	https://www.github.com/jacksiro/Q2A-Blog-Post-Plugin
+	https://www.github.com/Jacksiro/Q2A-Blog-Post-Plugin
 
 	Description: Blog Post Plugin Admin pages manager
 
