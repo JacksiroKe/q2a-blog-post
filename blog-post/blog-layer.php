@@ -22,7 +22,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				case 'user':
 				case 'user-wall':
 				case 'user-activity':
-				case 'user-articles':
+				case 'user-questions':
 				case 'user-answers':
 				case 'user-articles':
 					$navigation['articles'] = array(
@@ -31,6 +31,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 					);
 					break;				
 				case 'account':
+				case 'messages':
 				case 'favorites':
 					$navigation['articles'] = array(
 						  'label' => qa_lang('bp_lang/nav_articles'),
@@ -62,6 +63,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				} else $userhtml = qa_html($handle);
 
 				if ($usersection == 'articles') {
+					$this->template = 'user-articles';
 					$this->content = $this->bp_user_articles($handle, $userhtml);
 				}
 			}
