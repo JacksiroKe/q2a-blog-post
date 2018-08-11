@@ -34,7 +34,7 @@ if ( !defined('QA_VERSION') )
 	
 	qa_register_plugin_phrases('blog-lang-*.php', 'bp_lang');
 	qa_register_plugin_module('page', 'blog-post.php', 'blog_post', 'Blog Post');
-	qa_register_plugin_layer('users-layer.php', 'Blog Post: User Page');
+	qa_register_plugin_layer('blog-layer.php', 'Blog Post: User Page');
 		
 /*
 	Omit PHP closing tag to help avoid accidental output
