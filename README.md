@@ -6,10 +6,10 @@ The Blog module allows registered users to maintain an online journal, or blog. 
 FEATURES OF THE BLOG POST PLUGIN
 1. Article and Category management like Questions.
 2. Uses default user interface/theme.
-<img src="bp_articles.png"/>
+<img src="screenshots/bp_articles.png"/>
 
 3. Admin panel for managing blog settings and categories.
-<img src="bp_admin.png"/>
+<img src="screenshots/bp_admin.png"/>
 
 4. It uses the editor selected by the admin in settings.
-<img src="bp_write.png"/>
+<img src="screenshots/bp_write.png"/>
