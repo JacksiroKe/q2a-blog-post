@@ -139,7 +139,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8',
 				
 				'CREATE TABLE IF NOT EXISTS ^blog_users (
-					`userid` INT(10) UNSIGNED DEFAULT NULL,
+					`userid` INT(10) UNSIGNED NOT NULL,
 					`lastposted` DATETIME NOT NULL,
 					`pcount` INT(10) UNSIGNED NOT NULL DEFAULT 0,
 					`ccount` INT(10) UNSIGNED NOT NULL DEFAULT 0,

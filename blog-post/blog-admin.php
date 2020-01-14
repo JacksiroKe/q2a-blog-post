@@ -22,13 +22,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	class qa_html_theme_layer extends qa_html_theme_base {
 		var $plugin_directory;
 		var $plugin_url;
-		function qa_html_theme_layer($template, $content, $rooturl, $request)
-		{
-			global $qa_layers;
-			$this->plugin_directory = $qa_layers['Blog Settings']['directory'];
-			$this->plugin_url = $qa_layers['Blog Settings']['urltoroot'];
-			qa_html_theme_base::qa_html_theme_base($template, $content, $rooturl, $request);
-		}
 		
 		function doctype()
 		{
@@ -47,6 +40,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 					$this->content['title'] = qa_lang_html('admin/admin_title') . ' - ' . qa_lang_html('bp_lang/' . $adminsection );
 					$this->content = $this->bp_blog_settings();
 					break;
+
 				case 'bp_categories':
 					$this->template = $adminsection;
 					$this->bp_navigation($adminsection);
@@ -55,6 +49,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 					$this->content['title'] = qa_lang_html('admin/admin_title') . ' - ' . qa_lang_html('bp_lang/' . $adminsection );
 					$this->content = $this->bp_blog_categories();
 					break;
+					
 				case 'bp_moderate':
 					$this->template = $adminsection;
 					$this->bp_navigation($adminsection);
