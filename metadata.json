@@ -1,0 +1,11 @@
+{
+	"name": "Blog Post",
+	"description": "Allows registered users to maintain a blog on your Q2A site",
+	"version": "4.1",
+	"date": "2015-02-04",
+	"author": "JacksiroKe",
+	"author_uri": "https://github.com/JacksiroKe",
+	"license": "GPLv2",
+	"min_q2a": "1.6",
+	"load_order": "after_db_init"
+}

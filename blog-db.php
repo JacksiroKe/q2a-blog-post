@@ -1,7 +1,7 @@
 <?php
 /*
 	Blog Post by Jackson Siro
-	https://www.github.com/jacksiro/Q2A-Blog-Post-Plugin
+	https://github.com/JacksiroKe/Q2A-Blog-Post-Plugin
 
 	Description: Basic and Database functions for the blog post plugin
 

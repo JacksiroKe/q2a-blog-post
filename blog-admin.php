@@ -17,7 +17,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	require_once QA_INCLUDE_DIR . 'db/selects.php';
 	require_once QA_INCLUDE_DIR . 'app/options.php';
 	require_once QA_INCLUDE_DIR . 'app/admin.php';
-	require_once QA_BLOGSPOT_DIR . 'blog-base.php';
+	require_once QA_PLUGIN_DIR.'q2a-blog-post/blog-base.php';
 
 	class qa_html_theme_layer extends qa_html_theme_base {
 		var $plugin_directory;
@@ -144,7 +144,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				}
 			}
 			
-			$this->content['custom'] = '<p>If you think this plugin is great and helps you on your site please consider upgrading to a <b>Premium version</b> of this plugin is available on github encripted with a <b>password</b> which you can get if you drop <b>$ 30</b> on my paypal account: <b>smataweb@gmail.com</b></p>';
+			$this->content['custom'] = '<p>If you think this plugin is great and helps you on your site please consider droping something on my paypal account: <b>jaksiro@gmail.com</b></p>';
 			
 			$this->content['form'] = array(
 				'ok' => $formokhtml,

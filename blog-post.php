@@ -1,7 +1,7 @@
 <?php
 /*
 	Blog Post by Jackson Siro
-	https://www.github.com/jacksiro/Q2A-Blog-Post-Plugin
+	https://github.com/JacksiroKe/Q2A-Blog-Post-Plugin
 
 	Description: Blog Post Plugin database checker and user pages manager
 
@@ -16,9 +16,9 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	require_once QA_INCLUDE_DIR . 'util/string.php';
 	require_once QA_INCLUDE_DIR . 'app/users.php';
 	require_once QA_INCLUDE_DIR . 'app/blobs.php';
-	require_once QA_BLOGSPOT_DIR . 'blog-base.php';
-	require_once QA_BLOGSPOT_DIR . 'blog-db.php';
-	require_once QA_BLOGSPOT_DIR . 'blog-format.php';
+	require_once QA_PLUGIN_DIR.'q2a-blog-post/blog-base.php';
+	require_once QA_PLUGIN_DIR.'q2a-blog-post/blog-db.php';
+	require_once QA_PLUGIN_DIR.'q2a-blog-post/blog-format.php';
 
 	class blog_post
 	{
