@@ -400,7 +400,8 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			}
 
 			if (isset($post['summary'])) {
-				$fields['content'] = substr(strip_tags($post['summary']), 0, qa_opt('bp_content_max')) . ' ...';
+				$fields['content'] = substr(strip_tags($post['summary']), 0, strlen(qa_opt('bp_content_max')) ? qa_opt('bp_content_max') : 50) . ' ...';
+				
 			}
 
 			$fields['q_tags'] = array();
@@ -425,7 +426,8 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				qa_lang_html_sub_split('main/x_views', qa_format_number($post['views'], 0, true));
 			
 			$favoriteclass = '';
-			if (count(@$favoritemap['category'])) {
+			
+			if (is_array(@$favoritemap['category']) && count(@$favoritemap['category'])) {
 				if (@$favoritemap['category'][$post['categorybackpath']]) {
 					$favoriteclass = ' qa-cat-favorited';
 				} else {

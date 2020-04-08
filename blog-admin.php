@@ -144,7 +144,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				}
 			}
 			
-			$this->content['custom'] = '<p>If you think this plugin is great and helps you on your site please consider droping something on my paypal account: <b>jaksiro@gmail.com</b></p>';
+			$this->content['custom'] = '<p>If you find this plugin useful on your site, consider donating something on: <b><a href="https://paypal.com/jacksiro">My Paypal Account</a></b></p>';
 			
 			$this->content['form'] = array(
 				'ok' => $formokhtml,
@@ -270,7 +270,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		
 		function bp_blog_categories()
 		{
-			require_once QA_BLOGSPOT_DIR . 'blog-db.php';
+			require_once QA_PLUGIN_DIR . 'q2a-blog-post/blog-db.php';
 			$editcatid= qa_post_text('edit');
 			if (!isset($editcatid))
 				$editcatid= qa_get('edit');
@@ -832,14 +832,14 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			return $this->content;
 		}
 		
-		function bp_blog_moderation()
+		function bp_blog_moderate()
 		{
 			$html = 'Sorry '.qa_get_logged_in_handle().', this is a premium feature! You can upgrade/purchase the premium blog post plugin to enjoy this service.
 							<br>'; 
 					
 					
 			$this->content['error']= $html;
-			$this->content['custom'] = '<form action="#"><center>
+			$this->content['custom'] = '<form action="https://paypal.com/jacksiro"><center>
 									<input class="qa-form-tall-button qa-form-tall-button-save" type="submit" 
 									value="Upgrade your Blog Post NOW! >>">
 									</center></form><br>';

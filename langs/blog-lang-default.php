@@ -30,6 +30,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'articles_by_x' => 'Articles by ^',
 		'blog_permissions' => 'Blog Post Permissions',	
 		'blog_post' => 'Blog Post: ',	
+		'blog_post_title' => 'My Q2A Blog',	
 		'blog_save' => 'Blog Settings have been saved!',	
 		'blogcat_label' => 'Select a Category',	
 		'blogger_info' => 'Default information about a blogger',	

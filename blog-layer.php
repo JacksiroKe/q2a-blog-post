@@ -74,8 +74,8 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		{			
 			//require_once QA_INCLUDE_DIR . 'db/selects.php';
 			require_once QA_INCLUDE_DIR . 'app/format.php';
-			require_once QA_BLOGSPOT_DIR . 'blog-db.php';
-			require_once QA_BLOGSPOT_DIR . 'blog-format.php';
+			require_once QA_PLUGIN_DIR . 'q2a-blog-post/blog-db.php';
+			require_once QA_PLUGIN_DIR . 'q2a-blog-post/blog-format.php';
 			
 			$start = qa_get_start();
 			$loginuserid = qa_get_logged_in_userid();

@@ -520,8 +520,8 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			require_once QA_INCLUDE_DIR . 'db/selects.php';
 			require_once QA_INCLUDE_DIR . 'util/sort.php';
 			require_once QA_INCLUDE_DIR . 'app/captcha.php';
-			require_once QA_BLOGSPOT_DIR . 'blog-view.php';
-			require_once QA_BLOGSPOT_DIR . 'blog-article.php';
+			require_once QA_PLUGIN_DIR . 'q2a-blog-post/blog-view.php';
+			require_once QA_PLUGIN_DIR . 'q2a-blog-post/blog-article.php';
 			require_once QA_INCLUDE_DIR . 'app/updates.php';
 			$qa_content = qa_content_prepare();
 			
@@ -641,7 +641,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				}
 			}
 
-			//if (qa_is_http_post() || strlen($pagestate)) require QA_BLOGSPOT_DIR . 'blog-view.php';
+			//if (qa_is_http_post() || strlen($pagestate)) require QA_PLUGIN_DIR . 'q2a-blog-post/blog-view.php';
 
 			$formrequested = isset($formtype);
 
@@ -684,7 +684,9 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			} else { // ...in view mode
 				$qa_content['q_view'] = bp_page_p_article_view($article, $parentarticle, $closepost, $usershtml, $formrequested);
 
-				$qa_content['title'] = $qa_content['q_view']['title'];
+				if (array_key_exists('title', $qa_content['q_view']))
+					$qa_content['title'] = $qa_content['q_view']['title'];
+				else  $qa_content['title'] = qa_lang_html('bp_lang/blog_post_title');
 
 				$qa_content['description'] = qa_html(qa_shorten_string_line(qa_viewer_text($article['content'], $article['format']), 150));
 
