@@ -144,7 +144,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				}
 			}
 			
-			$this->content['custom'] = '<p>If you find this plugin useful on your site, consider donating something on: <b><a href="https://paypal.com/jacksiro">My Paypal Account</a></b></p>';
+			$this->content['custom'] = '<p><center>Get the Blog Post <b>Premium</b> Plugin for <b>$30</b></br>Pay via <b>Paypal</b>: <b><a href="https://paypal.com/jacksiro">https://paypal.com/jacksiro</a></b></center></p>';
 			
 			$this->content['form'] = array(
 				'ok' => $formokhtml,
@@ -834,8 +834,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		
 		function bp_blog_moderate()
 		{
-			$html = 'Sorry '.qa_get_logged_in_handle().', this is a premium feature! You can upgrade/purchase the premium blog post plugin to enjoy this service.
-							<br>'; 
+			$html = '<p><center>Sorry '.qa_get_logged_in_handle().', this is part of the premium feature! <hr>Upgrade to the <b>Premium</b> Blog Post Plugin for <b>$30</b> via <b>Paypal</b> to enjoy this service.<hr><b><a href="https://paypal.com/jacksiro">https://paypal.com/jacksiro</a></b></center></p>'; 
 					
 					
 			$this->content['error']= $html;
