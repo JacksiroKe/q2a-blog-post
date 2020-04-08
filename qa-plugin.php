@@ -31,7 +31,7 @@ if ( !defined('QA_VERSION') )
 
 	qa_register_layer('blog-admin.php', 'Blog Settings', $plugin_dir, $plugin_url );
 	
-	qa_register_plugin_phrases('blog-lang-*.php', 'bp_lang');
+	qa_register_plugin_phrases('langs/blog-lang-*.php', 'bp_lang');
 	qa_register_plugin_module('page', 'blog-post.php', 'blog_post', 'Blog Post');
 	qa_register_plugin_layer('blog-layer.php', 'Blog Post: User Page');
 		
