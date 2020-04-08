@@ -386,8 +386,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 
 		if ($isarticle) {
 			if (isset($post['title'])) {
-				$fields['url'] = bp_p_request( $post['permalink'] );
-
 				if (isset($options['blockwordspreg']))
 					$post['title'] = qa_block_words_replace($post['title'], $options['blockwordspreg']);
 
@@ -397,11 +395,15 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 				}
 				/*if (isset($post['score'])) // useful for setting match thresholds
 					$fields['title'].=' <small>('.$post['score'].')</small>';*/
-			}
+			} else $fields['title'] = 'Untitled Article';
+
+			$fields['url'] = bp_p_request( $post['permalink'] );
 
 			if (isset($post['summary'])) {
-				$fields['content'] = substr(strip_tags($post['summary']), 0, strlen(qa_opt('bp_content_max')) ? qa_opt('bp_content_max') : 50) . ' ...';
-				
+				$limit = strlen(qa_opt('bp_content_max')) ? qa_opt('bp_content_max') : 100;
+				if (strlen($post['summary']) > $limit) 
+					$fields['content'] = substr(strip_tags($post['summary']), 0, $limit). ' ...';
+				else $fields['content'] = substr(strip_tags($post['summary']), 0, $limit);
 			}
 
 			$fields['q_tags'] = array();

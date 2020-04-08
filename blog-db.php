@@ -216,7 +216,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	{
 		qa_db_query_sub(
 			'INSERT INTO ^blog_posts (catid, type, userid, cookieid, createip, title, content, permalink, format, tags, notify, name, created) ' .
-			'VALUES (#, $, #, $, #, UNHEX($), $, $, $, $, $, $, NOW())',
+			'VALUES (#, $, #, UNHEX($), $, $, $, $, $, $, $, $, NOW())',
 			$catid, $type, $userid, $cookieid, bin2hex(@inet_pton($ip)), $title, $content, $permalink, $format, $tagstring, $notify, $name
 		);
 		return qa_db_last_insert_id();

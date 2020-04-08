@@ -90,7 +90,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			if (!QA_FINAL_EXTERNAL_USERS && !is_array($useraccount)) // check the user exists
 				return include QA_INCLUDE_DIR . 'qa-page-not-found.php';
 
-
 			// Get information on user articles
 			$pagesize = qa_opt('page_size_qs');
 			$count = (int)@$userpoints['qposts'];

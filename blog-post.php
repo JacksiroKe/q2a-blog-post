@@ -197,8 +197,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			
 			// Check for permission error
 			$permiterror = qa_user_maximum_permit_error('bp_permit_post_p', QA_LIMIT_QUESTIONS);
-			//$permiterror = bp_user_maximum_permit_error('bp_permit_post_p', QA_LIMIT_BLOG_POSTS);
-			//function qa_default_option($name)
+
 			$qa_content = qa_content_prepare(false, array_keys(bp_cat_path($blog_cats, @$in['catid'])));
 
 			if ($permiterror) {
@@ -300,7 +299,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 						$permalink = gmdate( 'Y/m/d', time() ) . '/' . $slug;
 						
 						$postid = bp_post_create($userid, qa_get_logged_in_handle(), $cookieid,
-							$in['title'], $in['content'], $permalink, $in['format'], $in['text'], isset($in['tags']) ? qa_tags_to_tagstring($in['tags']) : '',
+							$title, $in['content'], $permalink, $in['format'], $in['text'], isset($in['tags']) ? qa_tags_to_tagstring($in['tags']) : '',
 							$in['notify'], $in['email'], $in['catid'], $in['extra'], $in['queued'], $in['name']);
 						qa_redirect(bp_p_request( $permalink ));
 					}
