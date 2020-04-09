@@ -14,4 +14,6 @@ The Blog post plugin allows registered users to maintain a blog on their Q2A sit
 <img src="screenshots/bp_write.png"/>
 
 ## Sites with this Plugin
-1. [My Q2A Test Site](https://qtoa.appsmata.com)
+1. [My Q2A Test Site](https://qtoa.appsmata.com/blog)
+
+### Get your site added here by submitting a pull request or an issue or emailing me.
