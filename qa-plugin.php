@@ -3,7 +3,7 @@
 	Plugin Name: Blog Post
 	Plugin URI: https://github.com/JacksiroKe/q2a-blog-post
 	Plugin Description: Allows registered users to maintain a blog on your Q2A site
-	Plugin Version: 4.1
+	Plugin Version: 5.0
 	Plugin Date: 2014-04-01
 	Plugin Author: JacksiroKe
 	Plugin Author URI: https://github.com/JacksiroKe
