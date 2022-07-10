@@ -1,7 +1,7 @@
 <?php
 /*
-	Blog Post by Jackson Siro
-	https://github.com/JacksiroKe/Q2A-Blog-Post-Plugin
+	Blog Post by Jack Siro
+	https://github.com/JacksiroKe/q2a-blog-post
 
 	Description: User's Page customization for the blog post plugin
 

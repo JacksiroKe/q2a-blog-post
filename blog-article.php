@@ -1,7 +1,7 @@
 <?php
 /*
-	Blog Post by Jackson Siro
-	https://github.com/JacksiroKe/Q2A-Blog-Post-Plugin
+	Blog Post by Jack Siro
+	https://github.com/JacksiroKe/q2a-blog-post
 
 	Description: Basic and Database functions for the blog post plugin
 
@@ -30,7 +30,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 
 	function bp_page_p_article_view($article, $parentarticle, $closepost, $usershtml, $formrequested)
 	{
-		$articleid = $article['postid'];
 		$userid = qa_get_logged_in_userid();
 		$cookieid = qa_cookie_get();
 
@@ -40,332 +39,28 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		$htmloptions['q_request'] = qa_q_request($article['postid'], $article['title']);
 		$q_view = bp_post_html_fields($article, $userid, $cookieid, $usershtml, null, $htmloptions);
 
-
+		
+		qa_set_template('question');
 		$q_view['main_form_tags'] = 'method="post" action="' . qa_self_html() . '"';
 		$q_view['voting_form_hidden'] = array('code' => qa_get_form_security_code('vote'));
-		$q_view['buttons_form_hidden'] = array('code' => qa_get_form_security_code('buttons-' . $articleid), 'qa_click' => '');
+		//$q_view['buttons_form_hidden'] = array('code' => qa_get_form_security_code('buttons-' . $articleid), 'qa_click' => '');
 
 		// Buttons for operating on the article
-		if (!$formrequested) { // don't show if another form is currently being shown on page
-			$clicksuffix = ' onclick="qa_show_waiting_after(this, false);"'; // add to operations that write to database
-			$buttons = array();
+		$q_view['form'] = array(
+			'style' => 'light',
+		);
+		
+		$hide_button = '<a href="' . qa_path_html("blog/hide/". $article['postid']) . '" class="qa-form-light-button qa-form-light-button-hide" title="' .qa_lang_html('bp_lang/hide_p_popup') . '">' .qa_lang_html('bp_lang/hide_p_popup') . '</a>';
+		$delete_button = '<a href="' . qa_path_html("blog/delete/". $article['postid']) . '" class="qa-form-light-button qa-form-light-button-delete" title="' .qa_lang_html('bp_lang/delete_p_popup') . '">' .qa_lang_html('bp_lang/delete_p_popup') . '</a>';
+		$edit_button = '<a href="' . qa_path_html("blog/edit/". $article['postid']) . '" class="qa-form-light-button qa-form-light-button-edit" title="' .qa_lang_html('bp_lang/edit_p_popup') . '">' .qa_lang_html('bp_lang/edit_p_popup') . '</a>';
 
-			if ($article['editbutton']) {
-				$buttons['edit'] = array(
-					'tags' => 'name="q_doedit"',
-					'label' => qa_lang_html('bp_lang/edit_button'),
-					'popup' => qa_lang_html('bp_lang/edit_p_popup'),
-				);
-			}
-
-			$hascategories = qa_using_categories();
-			if ($article['retagcatbutton']) {
-				$buttons['retagcat'] = array(
-					'tags' => 'name="q_doedit"',
-					'label' => qa_lang_html($hascategories ? 'bp_lang/recat_button' : 'bp_lang/retag_button'),
-					'popup' => qa_lang_html($hascategories
-						? (qa_using_tags() ? 'bp_lang/retag_cat_popup' : 'bp_lang/recat_popup')
-						: 'bp_lang/retag_popup'
-					),
-				);
-			}
-
-			if ($article['flagbutton']) {
-				$buttons['flag'] = array(
-					'tags' => 'name="q_doflag"' . $clicksuffix,
-					'label' => qa_lang_html($article['flagtohide'] ? 'bp_lang/flag_hide_button' : 'bp_lang/flag_button'),
-					'popup' => qa_lang_html('bp_lang/flag_p_popup'),
-				);
-			}
-
-			if ($article['unflaggable']) {
-				$buttons['unflag'] = array(
-					'tags' => 'name="q_dounflag"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/unflag_button'),
-					'popup' => qa_lang_html('bp_lang/unflag_popup'),
-				);
-			}
-
-			if ($article['clearflaggable']) {
-				$buttons['clearflags'] = array(
-					'tags' => 'name="q_doclearflags"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/clear_flags_button'),
-					'popup' => qa_lang_html('bp_lang/clear_flags_popup'),
-				);
-			}
-
-			if ($article['closeable']) {
-				$buttons['close'] = array(
-					'tags' => 'name="q_doclose"',
-					'label' => qa_lang_html('bp_lang/close_button'),
-					'popup' => qa_lang_html('bp_lang/close_p_popup'),
-				);
-			}
-
-			if ($article['reopenable']) {
-				$buttons['reopen'] = array(
-					'tags' => 'name="q_doreopen"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/reopen_button'),
-					'popup' => qa_lang_html('bp_lang/reopen_p_popup'),
-				);
-			}
-
-			if ($article['moderatable']) {
-				$buttons['approve'] = array(
-					'tags' => 'name="q_doapprove"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/approve_button'),
-					'popup' => qa_lang_html('bp_lang/approve_p_popup'),
-				);
-
-				$buttons['reject'] = array(
-					'tags' => 'name="q_doreject"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/reject_button'),
-					'popup' => qa_lang_html('bp_lang/reject_p_popup'),
-				);
-			}
-
-			if ($article['hideable']) {
-				$buttons['hide'] = array(
-					'tags' => 'name="q_dohide"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/hide_button'),
-					'popup' => qa_lang_html('bp_lang/hide_p_popup'),
-				);
-			}
-
-			if ($article['reshowable']) {
-				$buttons['reshow'] = array(
-					'tags' => 'name="q_doreshow"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/reshow_button'),
-					'popup' => qa_lang_html('bp_lang/reshow_p_popup'),
-				);
-			}
-
-			if ($article['deleteable']) {
-				$buttons['delete'] = array(
-					'tags' => 'name="q_dodelete"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/delete_button'),
-					'popup' => qa_lang_html('bp_lang/delete_p_popup'),
-				);
-			}
-
-			if ($article['claimable']) {
-				$buttons['claim'] = array(
-					'tags' => 'name="q_doclaim"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/claim_button'),
-					'popup' => qa_lang_html('bp_lang/claim_p_popup'),
-				);
-			}
-
-			if ($article['commentbutton']) {
-				$buttons['comment'] = array(
-					'tags' => 'name="p_docomment" id="p_docomment" onclick="return qa_toggle_element(\'c' . $articleid . '\')"',
-					'label' => qa_lang_html('bp_lang/comment_button'),
-					'popup' => qa_lang_html('bp_lang/comment_p_popup'),
-				);
-			}
-
-			$q_view['form'] = array(
-				'style' => 'light',
-				'buttons' => $buttons,
-			);
-		}
-
-
-		// Information about the article of the comment that this article follows on from (or a article directly)
-
-		if (isset($parentarticle)) {
-			$q_view['follows'] = array(
-				'label' => qa_lang_html(($article['parentid'] == $parentarticle['postid']) ? 'bp_lang/follows_p' : 'bp_lang/follows_a'),
-				'title' => qa_html(qa_block_words_replace($parentarticle['title'], qa_get_block_words_preg())),
-				'url' => qa_q_path_html($parentarticle['postid'], $parentarticle['title'], false,
-					($article['parentid'] == $parentarticle['postid']) ? 'P' : 'R', $article['parentid']),
-			);
-		}
-
-
-		// Information about the article that this article is a duplicate of (if appropriate)
-
-		if (isset($closepost)) {
-			if ($closepost['basetype'] == 'P') {
-				if ($closepost['hidden']) {
-					// don't show link for hidden articles
-					$q_view['closed'] = array(
-						'state' => qa_lang_html('main/closed'),
-						'label' => qa_lang_html('main/closed'),
-						'content' => '',
-					);
-				} else {
-					$q_view['closed'] = array(
-						'state' => qa_lang_html('main/closed'),
-						'label' => qa_lang_html('bp_lang/closed_as_duplicate'),
-						'content' => qa_html(qa_block_words_replace($closepost['title'], qa_get_block_words_preg())),
-						'url' => qa_q_path_html($closepost['postid'], $closepost['title']),
-					);
-				}
-
-			} elseif ($closepost['type'] == 'NOTE') {
-				$viewer = qa_load_viewer($closepost['content'], $closepost['format']);
-
-				$q_view['closed'] = array(
-					'state' => qa_lang_html('main/closed'),
-					'label' => qa_lang_html('bp_lang/closed_with_note'),
-					'content' => $viewer->get_html($closepost['content'], $closepost['format'], array(
-						'blockwordspreg' => qa_get_block_words_preg(),
-					)),
-				);
-			}
-		}
-
-
-		// Extra value display
-
-		if (strlen(@$article['extra']) && qa_opt('extra_field_active') && qa_opt('extra_field_display')) {
+		if ($userid == $article['userid'] || qa_get_logged_in_level() >= QA_USER_LEVEL_ADMIN)
 			$q_view['extra'] = array(
-				'label' => qa_html(qa_opt('extra_field_label')),
-				'content' => qa_html(qa_block_words_replace($article['extra'], qa_get_block_words_preg())),
+				'label' => '',
+				'content' => $edit_button . ($article['type'] == 'P_HIDDEN' ? $delete_button : $hide_button),
 			);
-		}
-
 
 		return $q_view;
-	}
-
-	function qa_page_q_answer_view($article, $comment, $isselected, $usershtml, $formrequested)
-	{
-		$commentid = $comment['postid'];
-		$userid = qa_get_logged_in_userid();
-		$cookieid = qa_cookie_get();
-
-		$htmloptions = qa_post_html_options($comment, null, true);
-		$htmloptions['isselected'] = $isselected;
-		$htmloptions['avatarsize'] = qa_opt('avatar_q_page_a_size');
-		$htmloptions['q_request'] = qa_q_request($article['postid'], $article['title']);
-		$a_view = bp_post_html_fields($comment, $userid, $cookieid, $usershtml, null, $htmloptions);
-
-		if ($comment['queued'])
-			$a_view['error'] = $comment['isbyuser'] ? qa_lang_html('bp_lang/a_your_waiting_approval') : qa_lang_html('bp_lang/a_waiting_your_approval');
-
-		$a_view['main_form_tags'] = 'method="post" action="' . qa_self_html() . '"';
-		$a_view['voting_form_hidden'] = array('code' => qa_get_form_security_code('vote'));
-		$a_view['buttons_form_hidden'] = array('code' => qa_get_form_security_code('buttons-' . $commentid), 'qa_click' => '');
-
-
-		// Selection/unselect buttons and others for operating on the comment
-
-		if (!$formrequested) { // don't show if another form is currently being shown on page
-			$prefix = 'a' . qa_html($commentid) . '_';
-			$clicksuffix = ' onclick="return qa_answer_click(' . qa_js($commentid) . ', ' . qa_js($article['postid']) . ', this);"';
-
-			if ($article['aselectable'] && !$comment['hidden'] && !$comment['queued']) {
-				if ($isselected)
-					$a_view['unselect_tags'] = 'title="' . qa_lang_html('bp_lang/unselect_popup') . '" name="' . $prefix . 'dounselect"' . $clicksuffix;
-				else
-					$a_view['select_tags'] = 'title="' . qa_lang_html('bp_lang/select_popup') . '" name="' . $prefix . 'doselect"' . $clicksuffix;
-			}
-
-			$buttons = array();
-
-			if ($comment['editbutton']) {
-				$buttons['edit'] = array(
-					'tags' => 'name="' . $prefix . 'doedit"',
-					'label' => qa_lang_html('bp_lang/edit_button'),
-					'popup' => qa_lang_html('bp_lang/edit_a_popup'),
-				);
-			}
-
-			if ($comment['flagbutton']) {
-				$buttons['flag'] = array(
-					'tags' => 'name="' . $prefix . 'doflag"' . $clicksuffix,
-					'label' => qa_lang_html($comment['flagtohide'] ? 'bp_lang/flag_hide_button' : 'bp_lang/flag_button'),
-					'popup' => qa_lang_html('bp_lang/flag_a_popup'),
-				);
-			}
-
-			if ($comment['unflaggable']) {
-				$buttons['unflag'] = array(
-					'tags' => 'name="' . $prefix . 'dounflag"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/unflag_button'),
-					'popup' => qa_lang_html('bp_lang/unflag_popup'),
-				);
-			}
-
-			if ($comment['clearflaggable']) {
-				$buttons['clearflags'] = array(
-					'tags' => 'name="' . $prefix . 'doclearflags"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/clear_flags_button'),
-					'popup' => qa_lang_html('bp_lang/clear_flags_popup'),
-				);
-			}
-
-			if ($comment['moderatable']) {
-				$buttons['approve'] = array(
-					'tags' => 'name="' . $prefix . 'doapprove"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/approve_button'),
-					'popup' => qa_lang_html('bp_lang/approve_a_popup'),
-				);
-
-				$buttons['reject'] = array(
-					'tags' => 'name="' . $prefix . 'doreject"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/reject_button'),
-					'popup' => qa_lang_html('bp_lang/reject_a_popup'),
-				);
-			}
-
-			if ($comment['hideable']) {
-				$buttons['hide'] = array(
-					'tags' => 'name="' . $prefix . 'dohide"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/hide_button'),
-					'popup' => qa_lang_html('bp_lang/hide_a_popup'),
-				);
-			}
-
-			if ($comment['reshowable']) {
-				$buttons['reshow'] = array(
-					'tags' => 'name="' . $prefix . 'doreshow"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/reshow_button'),
-					'popup' => qa_lang_html('bp_lang/reshow_a_popup'),
-				);
-			}
-
-			if ($comment['deleteable']) {
-				$buttons['delete'] = array(
-					'tags' => 'name="' . $prefix . 'dodelete"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/delete_button'),
-					'popup' => qa_lang_html('bp_lang/delete_a_popup'),
-				);
-			}
-
-			if ($comment['claimable']) {
-				$buttons['claim'] = array(
-					'tags' => 'name="' . $prefix . 'doclaim"' . $clicksuffix,
-					'label' => qa_lang_html('bp_lang/claim_button'),
-					'popup' => qa_lang_html('bp_lang/claim_a_popup'),
-				);
-			}
-
-			if ($comment['followable']) {
-				$buttons['follow'] = array(
-					'tags' => 'name="' . $prefix . 'dofollow"',
-					'label' => qa_lang_html('bp_lang/follow_button'),
-					'popup' => qa_lang_html('bp_lang/follow_a_popup'),
-				);
-			}
-
-			if ($comment['commentbutton']) {
-				$buttons['reply'] = array(
-					'tags' => 'name="' . $prefix . 'doreply" onclick="return qa_toggle_element(\'c' . $commentid . '\')"',
-					'label' => qa_lang_html('bp_lang/comment_button'),
-					'popup' => qa_lang_html('bp_lang/comment_a_popup'),
-				);
-			}
-
-			$a_view['form'] = array(
-				'style' => 'light',
-				'buttons' => $buttons,
-			);
-		}
-
-		return $a_view;
 	}
 
 	function qa_page_q_comment_view($article, $parent, $reply, $usershtml, $formrequested)
@@ -668,143 +363,10 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		return $rules;
 	}
 	
-	function qa_page_q_add_a_form(&$qa_content, $formid, $captchareason, $question, $in, $errors, $loadnow, $formrequested)
-{
-	// The 'approve', 'login', 'confirm', 'limit', 'userblock', 'ipblock' permission errors are reported to the user here
-	// The other option ('level') prevents the answer button being shown, in qa_page_q_post_rules(...)
-
-	switch (qa_user_post_permit_error('permit_post_a', $question, QA_LIMIT_ANSWERS)) {
-		case 'login':
-			$form = array(
-				'title' => qa_insert_login_links(qa_lang_html('question/answer_must_login'), qa_request()),
-			);
-			break;
-
-		case 'confirm':
-			$form = array(
-				'title' => qa_insert_login_links(qa_lang_html('question/answer_must_confirm'), qa_request()),
-			);
-			break;
-
-		case 'approve':
-			$form = array(
-				'title' => strtr(qa_lang_html('question/answer_must_be_approved'), array(
-					'^1' => '<a href="' . qa_path_html('account') . '">',
-					'^2' => '</a>',
-				)),
-			);
-			break;
-
-		case 'limit':
-			$form = array(
-				'title' => qa_lang_html('question/answer_limit'),
-			);
-			break;
-
-		default:
-			$form = array(
-				'title' => qa_lang_html('users/no_permission'),
-			);
-			break;
-
-		case false:
-			$editorname = isset($in['editor']) ? $in['editor'] : qa_opt('editor_for_as');
-			$editor = qa_load_editor(@$in['content'], @$in['format'], $editorname);
-
-			if (method_exists($editor, 'update_script'))
-				$updatescript = $editor->update_script('a_content');
-			else
-				$updatescript = '';
-
-			$custom = qa_opt('show_custom_answer') ? trim(qa_opt('custom_answer')) : '';
-
-			$form = array(
-				'tags' => 'method="post" action="' . qa_self_html() . '" name="a_form"',
-
-				'title' => qa_lang_html('question/your_answer_title'),
-
-				'fields' => array(
-					'custom' => array(
-						'type' => 'custom',
-						'note' => $custom,
-					),
-
-					'content' => array_merge(
-						qa_editor_load_field($editor, $qa_content, @$in['content'], @$in['format'], 'a_content', 12, $formrequested, $loadnow),
-						array(
-							'error' => qa_html(@$errors['content']),
-						)
-					),
-				),
-
-				'buttons' => array(
-					'answer' => array(
-						'tags' => 'onclick="' . $updatescript . ' return qa_submit_answer(' . qa_js($question['postid']) . ', this);"',
-						'label' => qa_lang_html('question/add_answer_button'),
-					),
-				),
-
-				'hidden' => array(
-					'a_editor' => qa_html($editorname),
-					'a_doadd' => '1',
-					'code' => qa_get_form_security_code('answer-' . $question['postid']),
-				),
-			);
-
-			if (!strlen($custom))
-				unset($form['fields']['custom']);
-
-			if ($formrequested || !$loadnow)
-				$form['buttons']['cancel'] = array(
-					'tags' => 'name="docancel"',
-					'label' => qa_lang_html('main/cancel_button'),
-				);
-
-			if (!qa_is_logged_in() && qa_opt('allow_anonymous_naming'))
-				qa_set_up_name_field($qa_content, $form['fields'], @$in['name'], 'a_');
-
-			qa_set_up_notify_fields($qa_content, $form['fields'], 'A', qa_get_logged_in_email(),
-				isset($in['notify']) ? $in['notify'] : qa_opt('notify_users_default'), @$in['email'], @$errors['email'], 'a_');
-
-			$onloads = array();
-
-			if ($captchareason) {
-				$captchaloadscript = qa_set_up_captcha_field($qa_content, $form['fields'], $errors, qa_captcha_reason_note($captchareason));
-
-				if (strlen($captchaloadscript))
-					$onloads[] = 'document.getElementById(' . qa_js($formid) . ').qa_show = function() { ' . $captchaloadscript . ' };';
-			}
-
-			if (!$loadnow) {
-				if (method_exists($editor, 'load_script'))
-					$onloads[] = 'document.getElementById(' . qa_js($formid) . ').qa_load = function() { ' . $editor->load_script('a_content') . ' };';
-
-				$form['buttons']['cancel']['tags'] .= ' onclick="return qa_toggle_element();"';
-			}
-
-			if (!$formrequested) {
-				if (method_exists($editor, 'focus_script'))
-					$onloads[] = 'document.getElementById(' . qa_js($formid) . ').qa_focus = function() { ' . $editor->focus_script('a_content') . ' };';
-			}
-
-			if (count($onloads)) {
-				$qa_content['script_onloads'][] = $onloads;
-			}
-
-			break;
-	}
-
-	$form['id'] = $formid;
-	$form['collapse'] = !$loadnow;
-	$form['style'] = 'tall';
-
-	return $form;
-}
-
 function qa_page_q_add_c_form(&$qa_content, $question, $parent, $formid, $captchareason, $in, $errors, $loadfocusnow)
 {
 	// The 'approve', 'login', 'confirm', 'userblock', 'ipblock' permission errors are reported to the user here
-	// The other option ('level') prevents the comment button being shown, in qa_page_q_post_rules(...)
+	// The other option ('level') prevents the comment button being shown, in bp_page_p_post_rules(...)
 
 	switch (qa_user_post_permit_error('permit_post_c', $parent, QA_LIMIT_COMMENTS)) {
 		case 'login':

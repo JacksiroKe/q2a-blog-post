@@ -1,7 +1,7 @@
 <?php
 /*
-	Blog Post by Jackson Siro
-	https://github.com/JacksiroKe/Q2A-Blog-Post-Plugin
+	Blog Post by Jack Siro
+	https://github.com/JacksiroKe/q2a-blog-post
 
 	Description: Basic and Database functions for the blog post plugin
 
@@ -247,10 +247,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 					$langstring = $article['ohidden'] ? 'main/hidden' : 'main/answer_reshown';
 				break;
 
-			case 'A-' . QA_UPDATE_CONTENT:
-				$langstring = @$article['opersonal'] ? 'misc/your_a_edited' : 'main/answer_edited';
-				break;
-
 			case 'C-':
 				$langstring = 'main/commented';
 				break;
@@ -354,7 +350,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		// Useful stuff used throughout function
 		$postid = $post['postid'];
 		$isarticle = $post['basetype'] == 'P';
-		$isanwer = $post['basetype'] == 'A';
 		$iscomment = $post['basetype'] == 'C';
 		$isbyuser = qa_post_is_by_user($post, $userid, $cookieid);
 		$anchor = urlencode(qa_anchor($post['basetype'], $postid));
@@ -374,9 +369,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			$fields['classes'] = ltrim($fields['classes'] . ' qa-q-closed');
 
 		if ($microdata) {
-			if ($isanwer) {
-				$fields['tags'] .= ' itemprop="suggestedAnswer' . ($isselected ? ' acceptedAnswer' : '') . '" itemscope itemtype="http://schema.org/Answer"';
-			}
 			if ($iscomment) {
 				$fields['tags'] .= ' itemscope itemtype="http://schema.org/Comment"';
 			}
@@ -411,15 +403,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			foreach ($tags as $tag) {
 				if (isset($options['blockwordspreg']) && count(qa_block_words_match_all($tag, $options['blockwordspreg']))) continue;
 				$fields['q_tags'][] = bp_tag_html($tag, $microdata, @$favoritemap['tag'][qa_strtolower($tag)]);
-			}
-
-			if (@$options['answersview'] && isset($post['ccount'])) {
-				$fields['answers_raw'] = $post['ccount'];
-
-				$fields['answers'] = ($post['ccount'] == 1) ? qa_lang_html_sub_split('main/1_comment', '1', '1')
-					: qa_lang_html_sub_split('main/x_comments', qa_format_number($post['ccount'], 0, true));
-
-				$fields['answer_selected'] = isset($post['selchildid']);
 			}
 
 			$fields['views_raw'] = $post['views'];
@@ -693,6 +676,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			if (isset($post['lastuserid']) && @$options['whoview'])
 				$fields['who_2'] = qa_who_to_html(isset($userid) && ($post['lastuserid'] == $userid), $post['lastuserid'], $usershtml, @$options['ipview'] ? @inet_ntop($post['lastip']) : null, false);
 		}
+		
 		return $fields;
 	}
 

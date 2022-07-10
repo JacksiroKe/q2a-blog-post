@@ -1,7 +1,7 @@
 <?php
 /*
-	Blog Post by Jackson Siro
-	https://github.com/JacksiroKe/Q2A-Blog-Post-Plugin
+	Blog Post by Jack Siro
+	https://github.com/JacksiroKe/q2a-blog-post
 
 	Description: Blog Post Plugin Language phrases
 
@@ -27,7 +27,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'approve_button' => 'approve',
 		'approve_c_popup' => 'Approve this reply',
 		'approve_p_popup' => 'Approve this article',
-		'articles_by_x' => 'Articles by ^',
 		'blog_permissions' => 'Blog Post Permissions',	
 		'blog_post' => 'Blog Post: ',	
 		'blog_post_title' => 'My Q2A Blog',	
@@ -50,7 +49,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'bp_nof_comments' => 'Number of Comments per article page',	
 		'bp_nof_home_articles' => 'Number of Articles per page',	
 		'bp_permit_delete_hidden' => 'Deleting hidden posts',	
-		'bp_permit_delete_hidden' => 'Deleting hidden posts',	
 		'bp_permit_flag' => 'Flagging posts',	
 		'bp_permit_hide_show' => 'Hiding or showing any post',	
 		'bp_permit_moderate' => 'Approving or rejecting posts',	
@@ -62,6 +60,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'categories_introduction' => 'To get started with article categories, click the \'Add a Blog Post Category\' button.',	
 		'category_none_error' => '^q article/s currently have no category - ^1set category^2',
 		'category_write_not_allowed' => 'You do not have permission to write articles in this category',
+		'category_required' => 'Select a category to proceed',
 		'claim_a_popup' => 'Assign this comment to your user account',
 		'claim_button' => 'I wrote this',
 		'claim_c_popup' => 'Assign this comment to your user account',
@@ -89,6 +88,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'delete_cat_reassign' => 'Delete this category and reassign its articles to:',	
 		'delete_p_popup' => 'Delete this article permanently',
 		'draft_button' => 'Save as a Draft',
+		'duplicate_content' => 'Duplicate article',
 		'edit_button' => 'edit',
 		'edit_p_popup' => 'Edit this article',			
 		'enable_plugin' => 'Enable the Blog Post Plugin',	
@@ -131,6 +131,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'p_waiting_your_approval' => 'This article is waiting for your approval',
 		'p_your_waiting_approval' => 'Your article will be checked and approved shortly.',
 		'post_button' => 'Publish Your Article',
+		'update_button' => 'Update Your Article',
 		'posted' => 'Published',
 		'recat_button' => 'recategorize',
 		'recat_popup' => 'Change this article\'s category',
@@ -150,8 +151,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'reshow_p_popup' => 'Reshow this article',
 		'reopen_p_popup' => 'Reopen this article',
 		'suffix_bp_avatar_size_comment' => 'px',
-		'suffix_bp_avatar_size_home' => 'px',		
-		'suffix_bp_avatar_size_home' => 'px',	
+		'suffix_bp_avatar_size_home' => 'px',
 		'suffix_bp_content_max' => 'characters on your blog\'s homepage',	
 		'suffix_bp_nof_comments' => '',
 		'suffix_bp_nof_home_articles' => '',
@@ -170,6 +170,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 		'view_p_must_confirm' => 'Please ^5confirm your email address^6 to view blog pages.',
 		'view_p_must_login' => 'Please ^1log in^2 or ^3register^4 to view blog pages.',	
 		'write_article' => 'Write an Article',	
+		'edit_article' => 'Edit the Article: ',	
 		'write_limit' => 'Too many article received - please try again in an hour',	
 		'write_must_be_approved' => 'Your account must be approved before you write an article. Please wait or ^1add more information^2.',	
 		'write_must_confirm' => 'Please ^5confirm your email address^6 to write an article.',	
