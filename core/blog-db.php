@@ -1,7 +1,7 @@
 <?php
 /*
  Blog Post by Jack Siro
- https://github.com/JacksiroKe/q2a-blog-post
+ https://github.com/JaxiroKe/q2a-blog-post
  Description: Basic and Database functions for the blog post plugin
  
 */
@@ -18,7 +18,9 @@ function bp_db_cat_create($parentid, $title, $tags)
 
 	qa_db_query_sub(
 		'INSERT INTO ^blog_cats (parentid, title, tags, position) VALUES (#, $, $, #)',
-		$parentid, $title, $tags, 1 + $lastpos
+		$parentid,
+		$title,
+		$tags, 1 + $lastpos
 	);
 
 	$catid = qa_db_last_insert_id();
@@ -35,24 +37,30 @@ function bp_db_cats_recalc_backpaths($firstcatid, $lastcatid = null)
 
 	qa_db_query_sub(
 		"UPDATE ^blog_cats AS x, (SELECT cat1.catid, CONCAT_WS('/', cat1.tags, cat2.tags, cat3.tags, cat4.tags) AS backpath FROM ^blog_cats AS cat1 LEFT JOIN ^blog_cats AS cat2 ON cat1.parentid=cat2.catid LEFT JOIN ^blog_cats AS cat3 ON cat2.parentid=cat3.catid LEFT JOIN ^blog_cats AS cat4 ON cat3.parentid=cat4.catid WHERE cat1.catid BETWEEN # AND #) AS a SET x.backpath=a.backpath WHERE x.catid=a.catid",
-		$firstcatid, $lastcatid // requires QA_CATEGORY_DEPTH=4
+		$firstcatid,
+		$lastcatid // requires QA_CATEGORY_DEPTH=4
 	);
 }
 
 function bp_db_cat_last_pos($parentid)
 {
-	return qa_db_read_one_value(qa_db_query_sub(
-		'SELECT COALESCE(MAX(position), 0) FROM ^blog_cats WHERE parentid<=>#',
-		$parentid
-	));
+	return qa_db_read_one_value(
+		qa_db_query_sub(
+			'SELECT COALESCE(MAX(position), 0) FROM ^blog_cats WHERE parentid<=>#',
+			$parentid
+		)
+	);
 }
 
 function bp_db_cat_child_depth($catid)
 {
-	$result = qa_db_read_one_assoc(qa_db_query_sub(
-		'SELECT COUNT(child1.catid) AS count1, COUNT(child2.catid) AS count2, COUNT(child3.catid) AS count3 FROM ^blog_cats AS child1 LEFT JOIN ^blog_cats AS child2 ON child2.parentid=child1.catid LEFT JOIN ^blog_cats AS child3 ON child3.parentid=child2.catid WHERE child1.parentid=#;', // requires QA_CATEGORY_DEPTH=4
-		$catid
-	));
+	$result = qa_db_read_one_assoc(
+		qa_db_query_sub(
+			'SELECT COUNT(child1.catid) AS count1, COUNT(child2.catid) AS count2, COUNT(child3.catid) AS count3 FROM ^blog_cats AS child1 LEFT JOIN ^blog_cats AS child2 ON child2.parentid=child1.catid LEFT JOIN ^blog_cats AS child3 ON child3.parentid=child2.catid WHERE child1.parentid=#;',
+			// requires QA_CATEGORY_DEPTH=4
+			$catid
+		)
+	);
 
 	for ($depth = QA_CATEGORY_DEPTH - 1; $depth >= 1; $depth--)
 		if ($result['count' . $depth])
@@ -65,7 +73,9 @@ function bp_db_cat_rename($catid, $title, $tags)
 {
 	qa_db_query_sub(
 		'UPDATE ^blog_cats SET title=$, tags=$ WHERE catid=#',
-		$title, $tags, $catid
+		$title,
+		$tags,
+		$catid
 	);
 
 	bp_db_cats_recalc_backpaths($catid); // may also require recalculation of its offspring's backpaths
@@ -75,22 +85,30 @@ function bp_db_cat_set_content($catid, $content)
 {
 	qa_db_query_sub(
 		'UPDATE ^blog_cats SET content=$ WHERE catid=#',
-		$content, $catid
+		$content,
+		$catid
 	);
 }
 
 function bp_db_cat_get_parent($catid)
 {
-	return qa_db_read_one_value(qa_db_query_sub(
-		'SELECT parentid FROM ^blog_cats WHERE catid=#',
-		$catid
-	));
+	return qa_db_read_one_value(
+		qa_db_query_sub(
+			'SELECT parentid FROM ^blog_cats WHERE catid=#',
+			$catid
+		)
+	);
 }
 
 function bp_db_cat_set_position($catid, $newposition)
 {
-	qa_db_ordered_move('blog_cats', 'catid', $catid, $newposition,
-		qa_db_apply_sub('parentid<=>#', array(bp_db_cat_get_parent($catid))));
+	qa_db_ordered_move(
+		'blog_cats',
+		'catid',
+		$catid,
+		$newposition,
+		qa_db_apply_sub('parentid<=>#', array(bp_db_cat_get_parent($catid)))
+	);
 }
 
 function bp_db_cat_set_parent($catid, $newparentid)
@@ -106,7 +124,8 @@ function bp_db_cat_set_parent($catid, $newparentid)
 
 		qa_db_query_sub(
 			'UPDATE ^blog_cats SET parentid=#, position=# WHERE catid=#',
-			$newparentid, 1 + $lastpos, $catid
+			$newparentid, 1 + $lastpos,
+			$catid
 		);
 	}
 }
@@ -118,60 +137,95 @@ function bp_db_cat_reassign($catid, $reassignid)
 
 function bp_db_cat_delete($catid)
 {
-	qa_db_ordered_delete('blog_cats', 'catid', $catid,
-		qa_db_apply_sub('parentid<=>#', array(bp_db_cat_get_parent($catid))));
+	qa_db_ordered_delete(
+		'blog_cats',
+		'catid',
+		$catid,
+		qa_db_apply_sub('parentid<=>#', array(bp_db_cat_get_parent($catid)))
+	);
 }
 
 function bp_db_cat_slug_to_id($parentid, $slug)
 {
-	return qa_db_read_one_value(qa_db_query_sub(
-		'SELECT catid FROM ^blog_cats WHERE parentid<=># AND tags=$',
-		$parentid, $slug
-	), true);
+	return qa_db_read_one_value(
+		qa_db_query_sub(
+			'SELECT catid FROM ^blog_cats WHERE parentid<=># AND tags=$',
+			$parentid,
+			$slug
+		), true);
 }
 
 function bp_db_count_cats()
 {
-	return qa_db_read_one_value(qa_db_query_sub(
-		'SELECT COUNT(*) FROM ^blog_cats'
-	));
+	return qa_db_read_one_value(
+		qa_db_query_sub(
+			'SELECT COUNT(*) FROM ^blog_cats'
+		)
+	);
 }
 
 function bp_db_count_catid_ps($catid)
 {
-	return qa_db_read_one_value(qa_db_query_sub(
-		"SELECT COUNT(*) FROM ^blog_posts WHERE catid<=># AND type='P'",
-		$catid
-	));
+	return qa_db_read_one_value(
+		qa_db_query_sub(
+			"SELECT COUNT(*) FROM ^blog_posts WHERE catid<=># AND type='P'",
+			$catid
+		)
+	);
 }
 
 //USER FUNCTIONS
 function bp_db_user_create($userid)
 {
-	qa_db_query_sub(userid, lastposted, pcount, points,
+	qa_db_query_sub(
+		userid,
+		lastposted,
+		pcount,
+		points,
 		'INSERT INTO ^blog_users (userid, pcount, points, lastposted) ' .
 		'VALUES ($, $, $, NOW())',
-		$userid, 1, 3
+		$userid,
+		1,
+		3
 	);
 }
 
 function bp_db_user_find_by_handle($userid)
 {
-	return qa_db_read_all_values(qa_db_query_sub(
-		'SELECT userid FROM ^users WHERE userid=$',
-		$userid
-	));
+	return qa_db_read_all_values(
+		qa_db_query_sub(
+			'SELECT userid FROM ^users WHERE userid=$',
+			$userid
+		)
+	);
 }
 
 function bp_db_user_account_selectspec($useridhandle, $isuserid)
 {
 	return array(
 		'columns' => array(
-			'^users.userid', 'passsalt', 'passcheck' => 'HEX(passcheck)', 'passhash', 'email', 'level', 'emailcode', 'handle',
-			'created' => 'UNIX_TIMESTAMP(created)', 'sessioncode', 'sessionsource', 'flags', 'loggedin' => 'UNIX_TIMESTAMP(loggedin)',
-			'loginip', 'written' => 'UNIX_TIMESTAMP(written)', 'writeip',
-			'avatarblobid' => 'BINARY avatarblobid', // cast to BINARY due to MySQL bug which renders it signed in a union
-			'avatarwidth', 'avatarheight', 'points', 'wallposts',
+			'^users.userid',
+			'passsalt',
+			'passcheck' => 'HEX(passcheck)',
+			'passhash',
+			'email',
+			'level',
+			'emailcode',
+			'handle',
+			'created' => 'UNIX_TIMESTAMP(created)',
+			'sessioncode',
+			'sessionsource',
+			'flags',
+			'loggedin' => 'UNIX_TIMESTAMP(loggedin)',
+			'loginip',
+			'written' => 'UNIX_TIMESTAMP(written)',
+			'writeip',
+			'avatarblobid' => 'BINARY avatarblobid',
+			// cast to BINARY due to MySQL bug which renders it signed in a union
+			'avatarwidth',
+			'avatarheight',
+			'points',
+			'wallposts',
 		),
 
 		'source' => '^users LEFT JOIN ^userpoints ON ^userpoints.userid=^users.userid WHERE ^users.' . ($isuserid ? 'userid' : 'handle') . '=$',
@@ -206,15 +260,19 @@ function bp_db_user_recent_ps_selectspec($voteuserid, $identifier, $count = null
 //POST FUNCTIONS
 function qa_bp_post_find_by_postid($postid)
 {
-	return qa_db_read_all_values(qa_db_query_sub(
-		"SELECT postid FROM ^blog_posts WHERE postid=$postid"
-	));
+	return qa_db_read_all_values(
+		qa_db_query_sub(
+			"SELECT postid FROM ^blog_posts WHERE postid=$postid"
+		)
+	);
 }
 function qa_bp_post_find_by_permalink($permalink)
 {
-	return qa_db_read_all_values(qa_db_query_sub(
-		"SELECT postid FROM ^blog_posts WHERE permalink LIKE '%" . $permalink . "%'"
-	));
+	return qa_db_read_all_values(
+		qa_db_query_sub(
+			"SELECT postid FROM ^blog_posts WHERE permalink LIKE '%" . $permalink . "%'"
+		)
+	);
 }
 
 function bp_db_post_create($type, $userid, $cookieid, $ip, $title, $content, $permalink, $format, $tagstring, $notify, $catid = null, $name = null)
@@ -222,7 +280,18 @@ function bp_db_post_create($type, $userid, $cookieid, $ip, $title, $content, $pe
 	qa_db_query_sub(
 		'INSERT INTO ^blog_posts (catid, type, userid, cookieid, createip, title, content, permalink, format, tags, notify, name, created) ' .
 		'VALUES (#, $, #, UNHEX($), $, $, $, $, $, $, $, $, NOW())',
-		$catid, $type, $userid, $cookieid, bin2hex(@inet_pton($ip)), $title, $content, $permalink, $format, $tagstring, $notify, $name
+		$catid,
+		$type,
+		$userid,
+		$cookieid,
+		bin2hex(@inet_pton($ip)),
+		$title,
+		$content,
+		$permalink,
+		$format,
+		$tagstring,
+		$notify,
+		$name
 	);
 	return qa_db_last_insert_id();
 }
@@ -232,13 +301,30 @@ function bp_db_post_update($postid, $title, $permalink, $content, $format, $tags
 	if (isset($lastuserid) || isset($lastip)) {
 		qa_db_query_sub(
 			'UPDATE ^blog_posts SET title=$, permalink=$, content=$, format=$, tags=$, catid=$, name=COALESCE($, name), notify=$, updated=NOW(), lastuserid=$, lastip=UNHEX($) WHERE postid=#',
-			$title, $permalink, $content, $format, $tagstring, $catid, $name, $notify, $lastuserid, bin2hex(@inet_pton($lastip)), $postid
+			$title,
+			$permalink,
+			$content,
+			$format,
+			$tagstring,
+			$catid,
+			$name,
+			$notify,
+			$lastuserid,
+			bin2hex(@inet_pton($lastip)),
+			$postid
 		);
-	}
-	else {
+	} else {
 		qa_db_query_sub(
 			'UPDATE ^blog_posts SET title=$, permalink=$, content=$, format=$, tags=$, catid=$, name=COALESCE($, name), notify=$ WHERE postid=#',
-			$title, $permalink, $content, $format, $tagstring, $catid, $name, $notify, $postid
+			$title,
+			$permalink,
+			$content,
+			$format,
+			$tagstring,
+			$catid,
+			$name,
+			$notify,
+			$postid
 		);
 	}
 }
@@ -248,13 +334,16 @@ function bp_db_post_hide($postid, $type, $lastuserid = null, $lastip = null)
 	if (isset($lastuserid) || isset($lastip)) {
 		qa_db_query_sub(
 			'UPDATE ^blog_posts SET type=$, updated=NOW(), lastuserid=$, lastip=UNHEX($) WHERE postid=#',
-			$type, $lastuserid, bin2hex(@inet_pton($lastip)), $postid
+			$type,
+			$lastuserid,
+			bin2hex(@inet_pton($lastip)),
+			$postid
 		);
-	}
-	else {
+	} else {
 		qa_db_query_sub(
 			'UPDATE ^blog_posts SET type=$ WHERE postid=#',
-			$type, $postid
+			$type,
+			$postid
 		);
 	}
 }
@@ -266,10 +355,12 @@ function bp_db_post_delete($postid)
 
 function bp_db_post_get_cat_path($postid)
 {
-	return qa_db_read_one_assoc(qa_db_query_sub(
-		'SELECT catid, catidpath1, catidpath2, catidpath3 FROM ^blog_posts WHERE postid=#',
-		$postid
-	)); // requires QA_CATEGORY_DEPTH=4
+	return qa_db_read_one_assoc(
+		qa_db_query_sub(
+			'SELECT catid, catidpath1, catidpath2, catidpath3 FROM ^blog_posts WHERE postid=#',
+			$postid
+		)
+	); // requires QA_CATEGORY_DEPTH=4
 }
 
 
@@ -285,23 +376,6 @@ function bp_db_bpqueuedcount_update()
 	}
 }
 
-function bp_db_catslugs_sql_args($categoryslugs, &$arguments)
-{
-	if (!is_array($categoryslugs)) {
-		// accept old-style string arguments for one category deep
-		$categoryslugs = strlen($categoryslugs) ? array($categoryslugs) : array();
-	}
-
-	$levels = count($categoryslugs);
-
-	if ($levels > 0 && $levels <= QA_CATEGORY_DEPTH) {
-		$arguments[] = qa_db_slugs_to_backpath($categoryslugs);
-		return (($levels == QA_CATEGORY_DEPTH) ? 'catid' : ('catidpath' . $levels)) . '=(SELECT catid FROM ^blog_cats WHERE backpath=$ LIMIT 1) AND ';
-	}
-
-	return '';
-}
-
 function bp_db_cat_path_pcount_update($path)
 {
 	bp_db_ifcat_pcount_update($path['catid']); // requires QA_CATEGORY_DEPTH=4
@@ -315,7 +389,11 @@ function bp_db_ifcat_pcount_update($catid)
 	if (qa_should_update_counts() && isset($catid)) {
 		qa_db_query_sub(
 			"UPDATE ^blog_cats SET pcount=GREATEST( (SELECT COUNT(*) FROM ^blog_posts WHERE catid=# AND type='P'), (SELECT COUNT(*) FROM ^blog_posts WHERE catidpath1=# AND type='P'), (SELECT COUNT(*) FROM ^blog_posts WHERE catidpath2=# AND type='P'), (SELECT COUNT(*) FROM ^blog_posts WHERE catidpath3=# AND type='P') ) WHERE catid=#",
-			$catid, $catid, $catid, $catid, $catid
+			$catid,
+			$catid,
+			$catid,
+			$catid,
+			$catid
 		); // requires QA_CATEGORY_DEPTH=4
 	}
 }
@@ -349,8 +427,7 @@ function bp_db_full_cat_selectspec($slugsorid, $isid)
 {
 	if ($isid) {
 		$identifiersql = 'catid=#';
-	}
-	else {
+	} else {
 		$identifiersql = 'backpath=$';
 		$slugsorid = qa_db_slugs_to_backpath($slugsorid);
 	}
@@ -436,8 +513,7 @@ function bp_db_post_meta_selectspec($postid, $title)
 
 	if (is_array($title)) {
 		$selectspec['arraykey'] = 'title';
-	}
-	else {
+	} else {
 		$selectspec['single'] = true;
 	}
 
@@ -453,11 +529,29 @@ function bp_db_posts_basic_selectspec($voteuserid = null, $full = false, $user =
 
 	$selectspec = array(
 		'columns' => array(
-			'^blog_posts.postid', '^blog_posts.catid', '^blog_posts.type', 'basetype' => 'LEFT(^blog_posts.type, 1)',
-			'hidden' => "INSTR(^blog_posts.type, '_HIDDEN')>0", 'queued' => "INSTR(^blog_posts.type, '_QUEUED')>0",
-			'^blog_posts.ccount', '^blog_posts.selchildid', '^blog_posts.closedbyid', '^blog_posts.upvotes', '^blog_posts.downvotes', '^blog_posts.netvotes', '^blog_posts.views', '^blog_posts.hotness',
-			'^blog_posts.flagcount', '^blog_posts.title', '^blog_posts.permalink', 'summary' => '^blog_posts.content', '^blog_posts.tags', 'created' => 'UNIX_TIMESTAMP(^blog_posts.created)', '^blog_posts.name',
-			'categoryname' => '^blog_cats.title', 'categorybackpath' => "^blog_cats.backpath",
+			'^blog_posts.postid',
+			'^blog_posts.catid',
+			'^blog_posts.type',
+			'basetype' => 'LEFT(^blog_posts.type, 1)',
+			'hidden' => "INSTR(^blog_posts.type, '_HIDDEN')>0",
+			'queued' => "INSTR(^blog_posts.type, '_QUEUED')>0",
+			'^blog_posts.ccount',
+			'^blog_posts.selchildid',
+			'^blog_posts.closedbyid',
+			'^blog_posts.upvotes',
+			'^blog_posts.downvotes',
+			'^blog_posts.netvotes',
+			'^blog_posts.views',
+			'^blog_posts.hotness',
+			'^blog_posts.flagcount',
+			'^blog_posts.title',
+			'^blog_posts.permalink',
+			'summary' => '^blog_posts.content',
+			'^blog_posts.tags',
+			'created' => 'UNIX_TIMESTAMP(^blog_posts.created)',
+			'^blog_posts.name',
+			'categoryname' => '^blog_cats.title',
+			'categorybackpath' => "^blog_cats.backpath",
 			'categoryids' => "CONCAT_WS(',', ^blog_posts.catidpath1, ^blog_posts.catidpath2, ^blog_posts.catidpath3, ^blog_posts.catid)",
 		),
 
@@ -523,17 +617,16 @@ function bp_db_cat_nav_selectspec($slugsorid, $isid, $ispostid = false, $full = 
 	if ($isid) {
 		if ($ispostid) {
 			$identifiersql = 'catid=(SELECT catid FROM ^blog_posts WHERE postid=#)';
-		}
-		else {
+		} else {
 			$identifiersql = 'catid=#';
 		}
-	}
-	else {
+	} else {
 		$identifiersql = 'backpath=$';
 		$slugsorid = qa_db_slugs_to_backpath($slugsorid);
 	}
 
-	$parentselects = array( // requires QA_CATEGORY_DEPTH=4
+	$parentselects = array(
+		// requires QA_CATEGORY_DEPTH=4
 		'SELECT NULL AS parentkey', // top level
 		'SELECT grandparent.parentid FROM ^blog_cats JOIN ^blog_cats AS parent ON ^blog_cats.parentid=parent.catid JOIN ^blog_cats AS grandparent ON parent.parentid=grandparent.catid WHERE ^blog_cats.' . $identifiersql, // 2 gens up
 		'SELECT parent.parentid FROM ^blog_cats JOIN ^blog_cats AS parent ON ^blog_cats.parentid=parent.catid WHERE ^blog_cats.' . $identifiersql,
@@ -596,7 +689,24 @@ function bp_db_slugs_to_cat_id_selectspec($slugs)
 	);
 }
 
-function bp_db_ps_selectspec($voteuserid, $sort, $start, $categoryslugs = null, $createip = null, $specialtype = false, $full = false, $count = null)
+function bp_db_catslugs_sql_args($categoryslugs, &$arguments)
+{
+	if (!is_array($categoryslugs)) {
+		// accept old-style string arguments for one category deep
+		$categoryslugs = strlen($categoryslugs) ? array($categoryslugs) : array();
+	}
+
+	$levels = count($categoryslugs);
+
+	if ($levels > 0 && $levels <= QA_CATEGORY_DEPTH) {
+		$arguments[] = qa_db_slugs_to_backpath($categoryslugs);
+		return 'catid=(SELECT catid FROM ^blog_cats WHERE backpath=$ LIMIT 1) AND ';
+	}
+
+	return '';
+}
+
+function bp_db_ps_selectspec($voteuserid, $sort, $start, $categoryslugs = null, $specialtype = false, $full = false, $count = null)
 {
 	if ($specialtype == 'P' || $specialtype == 'P_QUEUED')
 		$type = $specialtype;
@@ -627,17 +737,10 @@ function bp_db_ps_selectspec($voteuserid, $sort, $start, $categoryslugs = null, 
 	$selectspec['source'] .=
 		" JOIN (SELECT postid FROM ^blog_posts WHERE " .
 		bp_db_catslugs_sql_args($categoryslugs, $selectspec['arguments']) .
-		(isset($createip) ? "createip=UNHEX($) AND " : "") .
 		"type=$ " . $sortsql . " LIMIT #,#) y ON ^blog_posts.postid=y.postid";
 
-	if (isset($createip)) {
-		$selectspec['arguments'][] = bin2hex(@inet_pton($createip));
-	}
-
 	array_push($selectspec['arguments'], $type, $start, $count);
-
 	$selectspec['sortdesc'] = $sort;
-
 	return $selectspec;
 }
 

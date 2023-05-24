@@ -1,7 +1,7 @@
 <?php
 /*
  Blog Post by Jack Siro
- https://github.com/JacksiroKe/q2a-blog-post
+ https://github.com/JaxiroKe/q2a-blog-post
  Description: Basic and Database functions for the blog post plugin
  */
 
@@ -323,10 +323,9 @@ function bp_cat_navigation_sub($parentcategories, $parentid, $selecteds, $pathpr
 
 function bp_sub_navigation($request, $blog_cats)
 {
-	$bp_request = 'blog';
 	$navigation = array();
 	$navigation['all'] = array(
-		'label' => qa_lang('bp_lang/nav_all'),
+		'label' => qa_lang('bp_lang/nav_articles'),
 		'url' => qa_path_html('blog'),
 		'selected' => ($request == 'blog') ? 'selected' : '',
 	);
@@ -334,7 +333,7 @@ function bp_sub_navigation($request, $blog_cats)
 		$navigation[$blogcat['tags']] = array(
 			'label' => $blogcat['title'],
 			'url' => qa_path_html('blog/' . $blogcat['tags']),
-			'selected' => ($request == 'blog' . $blogcat['tags']) ? 'selected' : '',
+			'selected' => ($request == 'blog/' . $blogcat['tags']) ? 'selected' : '',
 		);
 	}
 
