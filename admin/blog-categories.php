@@ -23,14 +23,6 @@ class qa_html_theme_layer extends qa_html_theme_base
 	var $plugin_directory;
 	var $plugin_url;
 
-	public function __construct($template, $content, $rooturl, $request)
-	{
-		global $qa_layers;
-		$this->plugin_directory = $qa_layers['Extra Question Field Admin']['directory'];
-		$this->plugin_url = $qa_layers['Extra Question Field Admin']['urltoroot'];
-		qa_html_theme_base::qa_html_theme_base($template, $content, $rooturl, $request);
-	}
-	
 	function doctype()
 	{
 		global $qa_request;
