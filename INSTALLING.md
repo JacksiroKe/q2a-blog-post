@@ -1,6 +1,6 @@
 ## Installation Guide
 
-- Download the plugin as ZIP from [github](https://github.com/JacksiroKe/q2a-blog-post).
+- Download the plugin as ZIP from [github](https://github.com/JaxiroKe/q2a-blog-post).
 - Make a full backup of your q2a database before installing the plugin.
 - Extract the folder ``q2a-blog-post-master`` from the ZIP file.
 - Rename the folder ``q2a-blog-post-master`` to ``q2a-blog-post``.

@@ -1,7 +1,7 @@
 <?php
 /*
  Blog Post by Jack Siro
- https://github.com/JacksiroKe/q2a-blog-post
+ https://github.com/JaxiroKe/q2a-blog-post
  Description: Blog Post Plugin Admin pages manager
  
 */
@@ -16,7 +16,7 @@ require_once QA_INCLUDE_DIR . 'db/maxima.php';
 require_once QA_INCLUDE_DIR . 'db/selects.php';
 require_once QA_INCLUDE_DIR . 'app/options.php';
 require_once QA_INCLUDE_DIR . 'app/admin.php';
-require_once QA_PLUGIN_DIR . 'q2a-blog-post/blog-base.php';
+require_once QA_PLUGIN_DIR . 'q2a-blog-post/core/blog-base.php';
 
 class qa_html_theme_layer extends qa_html_theme_base
 {
@@ -30,26 +30,13 @@ class qa_html_theme_layer extends qa_html_theme_base
 		$errors = array();
 		$securityexpired = false;
 
-		//if (!qa_get_logged_in_level() >= QA_USER_LEVEL_ADMIN) return $qa_content;
-		switch ($adminsection) {
-			case 'bp_settings':
-				$this->template = $adminsection;
-				$this->bp_navigation($adminsection);
-				$this->content['suggest_next'] = "";
-				$this->content['error'] = $securityexpired ? qa_lang_html('admin/form_security_expired') : qa_admin_page_error();
-				$this->content['title'] = qa_lang_html('admin/admin_title') . ' - ' . qa_lang_html('bp_lang/' . $adminsection);
-				$this->content = $this->bp_blog_settings();
-				break;
-
-			case 'bp_categories':
-				$this->template = $adminsection;
-				$this->bp_navigation($adminsection);
-				$this->content['suggest_next'] = "";
-				$this->content['error'] = $securityexpired ? qa_lang_html('admin/form_security_expired') : qa_admin_page_error();
-				$this->content['title'] = qa_lang_html('admin/admin_title') . ' - ' . qa_lang_html('bp_lang/' . $adminsection);
-				$this->content = $this->bp_blog_categories();
-				break;
-
+		if ($adminsection == 'bp_categories') {
+			$this->content = qa_content_prepare();
+			$this->template = 'admin';
+			$this->content['suggest_next'] = "";
+			$this->content['error'] = $securityexpired ? qa_lang_html('admin/form_security_expired') : qa_admin_page_error();
+			$this->content['title'] = qa_lang_html('admin/admin_title') . ' - ' . qa_lang_html('bp_lang/' . $adminsection);
+			$this->content = $this->bp_blog_categories();
 		}
 		qa_html_theme_base::doctype();
 	}
@@ -58,207 +45,20 @@ class qa_html_theme_layer extends qa_html_theme_base
 	{
 		if ($this->template == 'admin') {
 			if ($class == 'nav-sub') {
-				$bp_navigation['bp_settings'] = array(
-					'label' => qa_lang_html('bp_lang/nav_settings'),
-					'url' => qa_path_html('admin/bp_settings'),
-				);
-
 				$bp_navigation['bp_categories'] = array(
 					'label' => qa_lang_html('bp_lang/nav_categories'),
 					'url' => qa_path_html('admin/bp_categories'),
+					'selected' => (strtolower(qa_request_part(1)) == 'bp_categories') ? 'selected' : '',
 				);
-
 			}
-			if ($this->request == 'admin/bp_settings' || $this->request == 'admin/bp_categories')
-				$bp_navigation = array_merge(qa_admin_sub_navigation(), $bp_navigation);
 		}
 		if (count($bp_navigation) > 1)
 			qa_html_theme_base::nav_list($bp_navigation, $class, $level = null);
 	}
 
-	function bp_navigation($request)
-	{
-		$this->content['navigation']['sub'] = qa_admin_sub_navigation();
-		$this->content['navigation']['sub']['bp_settings'] = array(
-			'label' => qa_lang('bp_lang/nav_settings'),
-			'url' => qa_path_html('admin/bp_settings'),
-			'selected' => ($request == 'bp_settings') ? 'selected' : '',
-		);
-		$this->content['navigation']['sub']['bp_categories'] = array(
-			'label' => qa_lang('bp_lang/nav_categories'),
-			'url' => qa_path_html('admin/bp_categories'),
-			'selected' => ($request == 'bp_categories') ? 'selected' : '',
-		);
-		return $this->content['navigation']['sub'];
-	}
-
-	function bp_blog_settings()
-	{
-		$formokhtml = null;
-		$form_fields = array();
-		$getoptions = array();
-		$permit_options = array();
-		$permissions = bp_permit_options();
-		$showoptions = array('bp_blog_title', 'bp_blog_tagline', 'bp_blog_editor', 'bp_blog_rules', 'bp_content_max', 'bp_avatar_size_home', 'bp_avatar_size_comment', 'bp_nof_home_articles', 'bp_nof_comments');
-		$optiontype = array('bp_content_max' => 'number', 'bp_avatar_size_home' => 'number', 'bp_avatar_size_comment' => 'number', 'bp_nof_home_articles' => 'number', 'bp_nof_comments' => 'number');
-		$getoptions = array_merge($showoptions, $permissions);
-		$options = bp_get_options($getoptions);
-
-		if (qa_clicked('doresetoptions')) {
-			if (!qa_check_form_security_code('admin/bp_settings', qa_post_text('code')))
-				$securityexpired = true;
-			else {
-				qa_reset_options($getoptions);
-				$formokhtml = qa_lang_html('admin/options_reset');
-			}
-		}
-		elseif (qa_clicked('dosaveoptions')) {
-			if (!qa_check_form_security_code('admin/bp_settings', qa_post_text('code')))
-				$securityexpired = true;
-			else {
-				foreach ($getoptions as $optionname) {
-					$optionvalue = qa_post_text('option_' . $optionname);
-
-					if (@$optiontype[$optionname] == 'number' || @$optiontype[$optionname] == 'checkbox' ||
-					(@$optiontype[$optionname] == 'number-blank' && strlen($optionvalue))
-					)
-						$optionvalue = (int)$optionvalue;
-					qa_set_option($optionname, $optionvalue);
-				}
-				$formokhtml = qa_lang_html('bp_lang/blog_save');
-			}
-		}
-
-		$this->content['custom'] = '<p><center><b>Support development of this Plugin</b> with anything from </br><b>$ 30</b> on <b>Paypal</b>: <b><a href="https://paypal.com/jacksiro">https://paypal.com/jacksiro</a></b></center></p>';
-
-		$this->content['form'] = array(
-			'ok' => $formokhtml,
-			'tags' => 'method="post" action="' . qa_path_html(qa_request()) . '"',
-			'style' => 'wide',
-			'fields' => array(),
-
-			'buttons' => array(
-				'save' => array(
-					'tags' => 'id="dosaveoptions"',
-					'label' => qa_lang_html('admin/save_options_button'),
-				),
-
-				'reset' => array(
-					'tags' => 'name="doresetoptions" onclick="return confirm(' . qa_js(qa_lang_html('admin/reset_options_confirm')) . ');"',
-					'label' => qa_lang_html('admin/reset_options_button'),
-				),
-			),
-
-			'hidden' => array(
-				'dosaveoptions' => '1',
-				'has_js' => '0',
-				'code' => qa_get_form_security_code('admin/bp_settings'),
-			),
-		);
-
-		foreach ($showoptions as $optionname) {
-			$value = $options[$optionname];
-			$type = @$optiontype[$optionname];
-			if ($type == 'number-blank')
-				$type = 'number';
-
-			$optionfield = array(
-				'id' => $optionname,
-				'label' => qa_lang_html('bp_lang/' . $optionname),
-				'tags' => 'name="option_' . $optionname . '" id="option_' . $optionname . '"',
-				'value' => qa_html($value),
-				'type' => $type,
-				'error' => qa_html(@$errors[$optionname]),
-			);
-
-			switch ($optionname) {
-				case 'bp_blog_title':
-					$optionfield['type'] = 'text';
-					$optionfield['style'] = 'tall';
-					break;
-				case 'bp_blog_tagline':
-				case 'bp_blog_rules':
-					$optionfield['type'] = 'textarea';
-					$optionfield['style'] = 'tall';
-					$optionfield['rows'] = 2;
-					break;
-				case 'bp_blog_editor':
-					$editors = qa_list_modules('editor');
-					$selectoptions = array();
-					foreach ($editors as $editor) {
-						$selectoptions[qa_html($editor)] = strlen($editor) ? qa_html($editor) : qa_lang_html('admin/basic_editor');
-						if ($editor == $value) {
-							$module = qa_load_module('editor', $editor);
-							if (method_exists($module, 'admin_form')) {
-								$optionfield['note'] = '<a href="' . qa_admin_module_options_path('editor', $editor) . '">' . qa_lang_html('admin/options') . '</a>';
-							}
-						}
-					}
-					qa_optionfield_make_select($optionfield, $selectoptions, $value, '');
-					break;
-				default:
-					$optionfield['type'] = 'number';
-					$optionfield['value'] = (int)$value;
-					$optionfield['suffix'] = qa_lang('bp_lang/suffix_' . $optionname);
-					break;
-			}
-			//$getoptions[] = $optionname;
-			//$form_fields[$optionname] = $optionfield;
-			$this->content['form']['fields'][$optionname] = $optionfield;
-		}
-
-		$this->content['form']['fields']['separator1'] = array(
-			'type' => 'custom',
-			'style' => 'tall',
-			'html' => '<h2>' . qa_lang('bp_lang/blog_permissions') . '</h2><hr>',
-		);
-
-		foreach ($permissions as $permit_option) {
-			$permit_value = qa_opt($permit_option);
-			$permit_field['label'] = qa_lang_html('bp_lang/' . $permit_option) . ':';
-			$permit_field['tags'] = 'name="option_' . $permit_option . '" id="option_' . $permit_option . '"';
-			if (in_array($permit_option, array('bp_permit_view_p_page', 'bp_permit_post', 'bp_permit_post_c')))
-				$widest = QA_PERMIT_ALL;
-			elseif ($permit_option == 'bp_permit_moderate' || $permit_option == 'bp_permit_hide_show')
-				$widest = QA_PERMIT_POINTS;
-			elseif ($permit_option == 'bp_permit_delete_hidden')
-				$widest = QA_PERMIT_EDITORS;
-			else
-				$widest = QA_PERMIT_USERS;
-
-			if ($permit_option == 'bp_permit_view_p_page') {
-				$narrowest = QA_PERMIT_APPROVED;
-				$dopoints = false;
-			}
-			elseif ($permit_option == 'bp_permit_moderate' || $permit_option == 'bp_permit_hide_show')
-				$narrowest = QA_PERMIT_MODERATORS;
-			elseif ($permit_option == 'bp_permit_post_c' || $permit_option == 'bp_permit_flag')
-				$narrowest = QA_PERMIT_EDITORS;
-			elseif ($permit_option == 'bp_permit_delete_hidden')
-				$narrowest = QA_PERMIT_ADMINS;
-			else
-				$narrowest = QA_PERMIT_EXPERTS;
-
-			$permitoptions = qa_admin_permit_options($widest, $narrowest, (!QA_FINAL_EXTERNAL_USERS) && qa_opt('confirm_user_emails'), $dopoints);
-
-			if (count($permitoptions) > 1) {
-				qa_optionfield_make_select($permit_field, $permitoptions, $permit_value,
-					($permit_value == QA_PERMIT_CONFIRMED) ? QA_PERMIT_USERS : min(array_keys($permitoptions)));
-			}
-			else {
-				$permit_field['type'] = 'static';
-				$permit_field['value'] = reset($permitoptions);
-			}
-			//$permit_options[$permit_option] = $permit_field;
-			$this->content['form']['fields'][$permit_option] = $permit_field;
-		}
-
-		return $this->content;
-	}
-
 	function bp_blog_categories()
 	{
-		require_once QA_PLUGIN_DIR . 'q2a-blog-post/blog-db.php';
+		require_once QA_PLUGIN_DIR . 'q2a-blog-post/core/blog-db.php';
 		$editcatid = qa_post_text('edit');
 		if (!isset($editcatid))
 			$editcatid = qa_get('edit');
@@ -274,11 +74,9 @@ class qa_html_theme_layer extends qa_html_theme_base
 			if (isset($parentid))
 				$editcategory = array('parentid' => $parentid);
 
-		}
-		else {
+		} else {
 			if (qa_clicked('doaddcategory'))
 				$editcategory = array();
-
 			elseif (qa_clicked('dosavecategory')) {
 				$parentid = qa_post_text('parent');
 				$editcategory = array('parentid' => strlen($parentid) ? $parentid : null);
@@ -302,16 +100,14 @@ class qa_html_theme_layer extends qa_html_theme_base
 		if (qa_clicked('dosaveoptions')) {
 			if (!qa_check_form_security_code('admin/bp_categories', qa_post_text('code')))
 				$securityexpired = true;
-
 			else {
-				qa_set_option('bp_allow_no_blogcat', (int)qa_post_text('option_bp_allow_no_blogcat'));
-				qa_set_option('bp_allow_no_sub_blogcat', (int)qa_post_text('option_bp_allow_no_sub_blogcat'));
+				qa_set_option('bp_allow_no_blogcat', (int) qa_post_text('option_bp_allow_no_blogcat'));
+				qa_set_option('bp_allow_no_sub_blogcat', (int) qa_post_text('option_bp_allow_no_sub_blogcat'));
 				$savedoptions = true;
 			}
 		}
 
 		// Process saving an old or new category
-
 		if (qa_clicked('docancel')) {
 			if ($setmissing || $setparent)
 				qa_redirect(qa_request(), array('edit' => $editcategory['catid']));
@@ -320,37 +116,32 @@ class qa_html_theme_layer extends qa_html_theme_base
 			else
 				qa_redirect(qa_request(), array('edit' => @$editcategory['parentid']));
 
-		}
-		elseif (qa_clicked('dosetmissing')) {
+		} elseif (qa_clicked('dosetmissing')) {
 			if (!qa_check_form_security_code('admin/bp_categories', qa_post_text('code')))
 				$securityexpired = true;
-
 			else {
-				$inreassign = qa_get_cat_field_value('reassign');
+				$inreassign = qa_get_category_field_value('reassign');
 				bp_db_cat_reassign($editcategory['catid'], $inreassign);
 				qa_redirect(qa_request(), array('recalc' => 1, 'edit' => $editcategory['catid']));
 			}
 
-		}
-		elseif (qa_clicked('dosavecategory')) {
+		} elseif (qa_clicked('dosavecategory')) {
 			if (!qa_check_form_security_code('admin/bp_categories', qa_post_text('code')))
 				$securityexpired = true;
-
 			elseif (qa_post_text('dodelete')) {
 				if (!$hassubcategory) {
-					$inreassign = qa_get_cat_field_value('reassign');
+					$inreassign = qa_get_category_field_value('reassign');
 					bp_db_cat_reassign($editcategory['catid'], $inreassign);
 					bp_db_cat_delete($editcategory['catid']);
 					qa_redirect(qa_request(), array('recalc' => 1, 'edit' => $editcategory['parentid']));
 				}
 
-			}
-			else {
+			} else {
 				require_once QA_INCLUDE_DIR . 'util/string.php';
 
 				$inname = qa_post_text('name');
 				$incontent = qa_post_text('content');
-				$inparentid = $setparent ? qa_get_cat_field_value('parent') : $editcategory['parentid'];
+				$inparentid = $setparent ? qa_get_category_field_value('parent') : $editcategory['parentid'];
 				$inposition = qa_post_text('position');
 				$errors = array();
 
@@ -366,9 +157,10 @@ class qa_html_theme_layer extends qa_html_theme_base
 					$errors['name'] = qa_lang_sub('main/max_length_x', QA_DB_MAX_CAT_PAGE_TITLE_LENGTH);
 				else {
 					foreach ($incategories as $category) {
-						if (!strcmp($category['parentid'], $inparentid) &&
-						strcmp($category['catid'], @$editcategory['catid']) &&
-						qa_strtolower($category['title']) == qa_strtolower($inname)
+						if (
+							!strcmp($category['parentid'], $inparentid) &&
+							strcmp($category['catid'], @$editcategory['catid']) &&
+							qa_strtolower($category['title']) == qa_strtolower($inname)
 						) {
 							$errors['name'] = qa_lang('admin/category_already_used');
 						}
@@ -430,17 +222,15 @@ class qa_html_theme_layer extends qa_html_theme_base
 						if ($setparent) {
 							bp_db_cat_set_parent($editcategory['catid'], $inparentid);
 							$recalc = true;
-						}
-						else {
+						} else {
 							bp_db_cat_set_content($editcategory['catid'], $incontent);
 							bp_db_cat_set_position($editcategory['catid'], $inposition);
 							$recalc = $hassubcategory && $inslug !== $editcategory['tags'];
 						}
 
-						qa_redirect(qa_request(), array('edit' => $editcategory['catid'], 'saved' => true, 'recalc' => (int)$recalc));
+						qa_redirect(qa_request(), array('edit' => $editcategory['catid'], 'saved' => true, 'recalc' => (int) $recalc));
 
-					}
-					else { // creating a new one
+					} else { // creating a new one
 						$catid = bp_db_cat_create($inparentid, $inname, $inslug);
 
 						bp_db_cat_set_content($catid, $incontent);
@@ -471,7 +261,8 @@ class qa_html_theme_layer extends qa_html_theme_base
 
 				'buttons' => array(
 					'save' => array(
-						'tags' => 'id="dosaveoptions"', // just used for qa_recalc_click()
+						'tags' => 'id="dosaveoptions"',
+						// just used for qa_recalc_click()
 						'label' => qa_lang_html('main/save_button'),
 					),
 
@@ -482,19 +273,25 @@ class qa_html_theme_layer extends qa_html_theme_base
 				),
 
 				'hidden' => array(
-					'dosetmissing' => '1', // for IE
+					'dosetmissing' => '1',
+					// for IE
 					'edit' => @$editcategory['catid'],
 					'missing' => '1',
 					'code' => qa_get_form_security_code('admin/bp_categories'),
 				),
 			);
 
-			bp_set_up_cat_field($qa_content, $this->content['form']['fields']['reassign'], 'reassign',
-				$categories, @$editcategory['catid'], qa_opt('bp_allow_no_blogcat'), qa_opt('bp_allow_no_sub_blogcat'));
+			bp_set_up_cat_field(
+				$qa_content, $this->content['form']['fields']['reassign'],
+				'reassign',
+				$categories,
+				@$editcategory['catid'],
+				qa_opt('bp_allow_no_blogcat'),
+				qa_opt('bp_allow_no_sub_blogcat')
+			);
 
 
-		}
-		elseif (isset($editcategory)) {
+		} elseif (isset($editcategory)) {
 			$this->content['form'] = array(
 				'tags' => 'method="post" action="' . qa_path_html(qa_request()) . '"',
 
@@ -537,7 +334,8 @@ class qa_html_theme_layer extends qa_html_theme_base
 
 				'buttons' => array(
 					'save' => array(
-						'tags' => 'id="dosaveoptions"', // just used for qa_recalc_click
+						'tags' => 'id="dosaveoptions"',
+						// just used for qa_recalc_click
 						'label' => qa_lang_html(isset($editcategory['catid']) ? 'main/save_button' : 'bp_lang/add_cat_button'),
 					),
 
@@ -548,10 +346,11 @@ class qa_html_theme_layer extends qa_html_theme_base
 				),
 
 				'hidden' => array(
-					'dosavecategory' => '1', // for IE
+					'dosavecategory' => '1',
+					// for IE
 					'edit' => @$editcategory['catid'],
 					'parent' => @$editcategory['parentid'],
-					'setparent' => (int)$setparent,
+					'setparent' => (int) $setparent,
 					'code' => qa_get_form_security_code('admin/bp_categories'),
 				),
 			);
@@ -569,23 +368,26 @@ class qa_html_theme_layer extends qa_html_theme_base
 
 				$childdepth = bp_db_cat_child_depth($editcategory['catid']);
 
-				bp_set_up_cat_field($qa_content, $this->content['form']['fields']['parent'], 'parent',
+				bp_set_up_cat_field(
+					$qa_content, $this->content['form']['fields']['parent'],
+					'parent',
 					isset($incategories) ? $incategories : $categories, isset($inparentid) ? $inparentid : @$editcategory['parentid'],
-					true, true, QA_CATEGORY_DEPTH - 1 - $childdepth, @$editcategory['catid']);
+					true,
+					true, QA_CATEGORY_DEPTH - 1 - $childdepth,
+					@$editcategory['catid']
+				);
 
 				$this->content['form']['fields']['parent']['options'][''] = qa_lang_html('admin/category_top_level');
 
 				@$this->content['form']['fields']['parent']['note'] .= qa_lang_html_sub('admin/category_max_depth_x', QA_CATEGORY_DEPTH);
 
-			}
-			elseif (isset($editcategory['catid'])) { // existing category
+			} elseif (isset($editcategory['catid'])) { // existing category
 				if ($hassubcategory) {
 					$this->content['form']['fields']['name']['note'] = qa_lang_html('admin/category_no_delete_subs');
 					unset($this->content['form']['fields']['delete']);
 					unset($this->content['form']['fields']['reassign']);
 
-				}
-				else {
+				} else {
 					$this->content['form']['fields']['delete'] = array(
 						'tags' => 'name="dodelete" id="dodelete"',
 						'label' =>
@@ -600,8 +402,14 @@ class qa_html_theme_layer extends qa_html_theme_base
 						'tags' => 'name="reassign"',
 					);
 
-					bp_set_up_cat_field($qa_content, $this->content['form']['fields']['reassign'], 'reassign',
-						$categories, $editcategory['parentid'], true, true, null, $editcategory['catid']);
+					bp_set_up_cat_field(
+						$this->content, $this->content['form']['fields']['reassign'],
+						'reassign',
+						$categories, $editcategory['parentid'],
+						true,
+						true,
+						null, $editcategory['catid']
+					);
 				}
 
 				$this->content['form']['fields']['blogposts'] = array(
@@ -609,9 +417,9 @@ class qa_html_theme_layer extends qa_html_theme_base
 					'type' => 'static',
 					'value' => '<a href="' . qa_path_html('blog/' . bp_cat_path_request($categories, $editcategory['catid'])) . '">' .
 					($editcategory['pcount'] == 1
-					? qa_lang_html_sub('bp_lang/1_blogpost', '1', '1')
-					: qa_lang_html_sub('bp_lang/x_blogposts', qa_format_number($editcategory['pcount']))
-				) . '</a>',
+						? qa_lang_html_sub('bp_lang/1_blogpost', '1', '1')
+						: qa_lang_html_sub('bp_lang/x_blogposts', qa_format_number($editcategory['pcount']))
+					) . '</a>',
 				);
 
 				if ($hassubcategory && !qa_opt('bp_allow_no_sub_blogcat')) {
@@ -619,27 +427,32 @@ class qa_html_theme_layer extends qa_html_theme_base
 
 					if ($nosubcount) {
 						$this->content['form']['fields']['blogposts']['error'] =
-							strtr(qa_lang_html('admin/category_no_sub_error'), array(
-							'^q' => qa_format_number($nosubcount),
-							'^1' => '<a href="' . qa_path_html(qa_request(), array('edit' => $editcategory['catid'], 'missing' => 1)) . '">',
-							'^2' => '</a>',
-						));
+							strtr(
+								qa_lang_html('admin/category_no_sub_error'),
+								array(
+									'^q' => qa_format_number($nosubcount),
+									'^1' => '<a href="' . qa_path_html(qa_request(), array('edit' => $editcategory['catid'], 'missing' => 1)) . '">',
+									'^2' => '</a>',
+								)
+							);
 					}
 				}
 
-				qa_set_display_rules($qa_content, array(
-					'position_display' => '!dodelete',
-					'slug_display' => '!dodelete',
-					'content_display' => '!dodelete',
-					'parent_display' => '!dodelete',
-					'children_display' => '!dodelete',
-					'reassign_display' => 'dodelete',
-					'reassign_shown' => 'dodelete',
-					'reassign_hidden' => '!dodelete',
-				));
+				qa_set_display_rules(
+					$qa_content,
+					array(
+						'position_display' => '!dodelete',
+						'slug_display' => '!dodelete',
+						'content_display' => '!dodelete',
+						'parent_display' => '!dodelete',
+						'children_display' => '!dodelete',
+						'reassign_display' => 'dodelete',
+						'reassign_shown' => 'dodelete',
+						'reassign_hidden' => '!dodelete',
+					)
+				);
 
-			}
-			else { // new category
+			} else { // new category
 				unset($this->content['form']['fields']['delete']);
 				unset($this->content['form']['fields']['reassign']);
 				unset($this->content['form']['fields']['slug']);
@@ -693,7 +506,6 @@ class qa_html_theme_layer extends qa_html_theme_base
 
 				if (isset($editcategory['position']))
 					$positionvalue = $positionoptions[$editcategory['position']];
-
 				else {
 					$positionvalue = isset($previous) ? qa_lang_html_sub('admin/after_x', qa_html($previous['title'])) : qa_lang_html('admin/first');
 					$positionoptions[1 + @max(array_keys($positionoptions))] = $positionvalue;
@@ -734,16 +546,14 @@ class qa_html_theme_layer extends qa_html_theme_base
 							'type' => 'static',
 							'value' => $childrenhtml,
 						);
-					}
-					else {
+					} else {
 						$this->content['form']['fields']['name']['note'] = qa_lang_html_sub('admin/category_no_add_subs_x', QA_CATEGORY_DEPTH);
 					}
 
 				}
 			}
 
-		}
-		else {
+		} else {
 			$this->content['form'] = array(
 				'tags' => 'method="post" action="' . qa_path_html(qa_request()) . '"',
 
@@ -787,8 +597,8 @@ class qa_html_theme_layer extends qa_html_theme_base
 							qa_html($category['title']) .
 							'</a> - ' .
 							($category['pcount'] == 1
-							? qa_lang_html_sub('bp_lang/1_blogpost', '1', '1')
-							: qa_lang_html_sub('bp_lang/x_blogposts', qa_format_number($category['pcount']))
+								? qa_lang_html_sub('bp_lang/1_blogpost', '1', '1')
+								: qa_lang_html_sub('bp_lang/x_blogposts', qa_format_number($category['pcount']))
 							) . '<br/>';
 					}
 				}
@@ -811,11 +621,14 @@ class qa_html_theme_layer extends qa_html_theme_base
 
 					if ($nocatcount) {
 						$this->content['form']['fields']['bp_allow_no_blogcat']['error'] =
-							strtr(qa_lang_html('bp_lang/category_none_error'), array(
-							'^q' => qa_format_number($nocatcount),
-							'^1' => '<a href="' . qa_path_html(qa_request(), array('missing' => 1)) . '">',
-							'^2' => '</a>',
-						));
+							strtr(
+								qa_lang_html('bp_lang/category_none_error'),
+								array(
+									'^q' => qa_format_number($nocatcount),
+									'^1' => '<a href="' . qa_path_html(qa_request(), array('missing' => 1)) . '">',
+									'^2' => '</a>',
+								)
+							);
 					}
 				}
 
@@ -826,10 +639,24 @@ class qa_html_theme_layer extends qa_html_theme_base
 					'value' => qa_opt('bp_allow_no_sub_blogcat'),
 				);
 
-			}
-			else
+			} else
 				unset($this->content['form']['buttons']['save']);
 		}
+
+		if (qa_get('recalc')) {
+			$this->content['form']['ok'] = '<span id="recalc_ok">' . qa_lang_html('admin/recalc_categories') . '</span>';
+			$this->content['form']['hidden']['code_recalc'] = qa_get_form_security_code('admin/recalc');
+		
+			$this->content['script_rel'][] = 'qa-content/qa-admin.js?' . QA_VERSION;
+			$this->content['script_var']['qa_warning_recalc'] = qa_lang('admin/stop_recalc_warning');
+		
+			$this->content['script_onloads'][] = array(
+				"qa_recalc_click('dorecalccategories', document.getElementById('dosaveoptions'), null, 'recalc_ok');"
+			);
+		}
+		
+		$this->content['navigation']['sub'] = qa_admin_sub_navigation();
+
 		return $this->content;
 	}
 
